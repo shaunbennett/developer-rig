@@ -8,6 +8,7 @@ import { createExtensionObject } from '../util/extension';
 import { createSignedToken } from '../util/token';
 import { fetchManifest, fetchExtensionManifest } from '../util/api';
 import { EXTENSION_VIEWS, BROADCASTER_CONFIG, LIVE_CONFIG, CONFIGURATIONS } from '../constants/nav-items'
+import { ReverseExtensionAnchors } from '../constants/extension-types';
 import { ViewerTypes } from '../constants/viewer-types';
 import { OverlaySizes } from '../constants/overlay-sizes';
 import { IdentityOptions } from '../constants/identity-options';
@@ -24,6 +25,7 @@ export class Rig extends Component {
       version: process.env.EXT_VERSION,
       channelId: process.env.EXT_CHANNEL_ID,
       userName: process.env.EXT_USER_NAME,
+      viewConfig: process.env.EXT_VIEW_CONFIG,
       mode: ExtensionMode.Viewer,
       extensionViews: [],
       manifest: {},
@@ -37,12 +39,8 @@ export class Rig extends Component {
     this._boundDeleteExtensionView = this._deleteExtensionView.bind(this);
   }
 
-  componentDidMount() {
-    this._fetchInitialConfiguration();
-  }
-
   componentWillMount() {
-    this._initLocalStorage();
+    this._fetchInitialConfiguration();
   }
 
   openConfigurationsHandler = () => {
@@ -117,6 +115,9 @@ export class Rig extends Component {
 
   _onConfigurationSuccess = (data) => {
     this.setState(data);
+    if (data.manifest) {
+      this._initViews();
+    }
   }
 
   _onConfigurationError = (errMsg) => {
@@ -146,6 +147,29 @@ export class Rig extends Component {
     });
     this._pushExtensionViews(extensionViews);
     this.closeExtensionViewDialog();
+  }
+
+  createViews = () => {
+    const views = [];
+    Object.keys(this.state.viewConfig).forEach((id, index) => {
+      const config = this.state.viewConfig[id];
+      views.push({
+        id: id,
+        type: ReverseExtensionAnchors[config.viewType],
+        extension: createExtensionObject(
+          this.state.manifest,
+          config.role,
+          config.isLinked,
+          this.state.userName,
+          this.state.channelId,
+          this.state.secret
+        ),
+        linked: config.isLinked,
+        role: config.role,
+        overlaySize: (config.viewSize.size === 'Custom') ? {width: config.viewSize.width, height: config.viewSize.height} : OverlaySizes[config.viewSize.size],
+      });
+    });
+    return views;
   }
 
   render() {
@@ -201,6 +225,12 @@ export class Rig extends Component {
 
   _fetchInitialConfiguration() {
     fetchManifest("api.twitch.tv", this.state.clientId, this.state.userName, this.state.version, this.state.channelId, this.state.secret, this._onConfigurationSuccess, this._onConfigurationError);
+  }
+
+  _initViews() {
+    this.setState({
+      extensionViews: this.createViews(),
+    })
   }
 
   _initLocalStorage() {

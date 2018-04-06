@@ -89,6 +89,18 @@ function getClientEnvironment(publicUrl) {
   raw['EXT_VERSION'] = process.env.EXT_VERSION || '';
   raw['EXT_CHANNEL_ID'] = process.env.EXT_CHANNEL || '';
   raw['EXT_USER_NAME'] = process.env.EXT_OWNER_NAME || '';
+  let extViewConfig = {};
+  if (process.env.EXT_VIEW_CONFIG && fs.existsSync(process.env.EXT_VIEW_CONFIG)) {
+    const data = fs.readFileSync(process.env.EXT_VIEW_CONFIG, 'utf8');
+    try {
+      //TODO: enforce schema here
+      extViewConfig = JSON.parse(data);
+    } catch (e) {
+      console.log('Invalid JSON found in ' + process.env.EXT_VIEW_CONFIG);
+      process.exit(1);
+    }
+  }
+  raw['EXT_VIEW_CONFIG'] = extViewConfig;
 
   // Stringify all values so we can feed into Webpack DefinePlugin
   const stringified = {
