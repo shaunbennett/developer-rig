@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "type": "object",
+  "additionalProperties": {
+    "type": { "$ref": "#/definitions/extensionView" }
+  },
+  "definitions": {
+    "extensionView": {
+      "properties": {
+        "role": {
+          "enum": ["Broadcaster", "Logged-Out Viewer", "Logged-In Viewer"]
+        },
+        "isLinked": {
+          "type": "boolean"
+        },
+        "viewType": {
+          "enum": ["Overlay", "Panel"]
+        },
+        "viewSize": {
+          "type": "object",
+          "oneOf": [
+            {
+              "required": ["size"],
+              "properties": {
+                "size": {
+                  "enum": ["640x480","576x432","512x384","448x336"]
+                }
+              }
+            },
+            {
+              "required": ["size"],
+              "properties": {
+                "size": {
+                  "enum": ["Custom"]
+                },
+                "height": {
+                  "type": "integer"
+                },
+                "width": {
+                  "type": "integer"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

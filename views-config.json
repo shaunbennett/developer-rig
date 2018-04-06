@@ -1,0 +1,10 @@
+{
+  "broadcaster": {
+    "role": "Broadcaster",
+    "isLinked": false,
+    "viewType": "Overlay",
+    "viewSize": {
+      "size": "640x480"
+    }
+  }
+}
