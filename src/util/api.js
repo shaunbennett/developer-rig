@@ -64,7 +64,7 @@ export function fetchExtensionManifest(host, clientId, version, jwt, onSuccess, 
         onError("Unable to retrieve extension manifest, please verify EXT_OWNER_NAME and EXT_SECRET");
       }
   }).catch((error) => {
-      onError(error);
+      onError(error.toString());
   });
 }
 
@@ -100,6 +100,6 @@ export function fetchManifest(host, clientId, username, version, channelId, secr
       const token = createSignedToken(RIG_ROLE, '', userId, channelId, secret);
       return fetchExtensionManifest(host, clientId, version, token, onSuccess, onError);
   }).catch((error) => {
-      onError(error);
+      onError(error.toString());
   });
 }
