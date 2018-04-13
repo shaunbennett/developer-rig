@@ -27,7 +27,7 @@ export class Rig extends Component {
       userName: process.env.EXT_USER_NAME,
       viewConfig: process.env.EXT_VIEW_CONFIG,
       mode: ExtensionMode.Viewer,
-      extensionViews: [],
+      extensionViews: {},
       manifest: {},
       showExtensionsView: false,
       showConfigurations: false,
@@ -149,25 +149,37 @@ export class Rig extends Component {
     this.closeExtensionViewDialog();
   }
 
-  createViews = () => {
-    const views = [];
+  createNewView = (extensionType, role, isLinked, viewSize) => {
+    const newView = this.createView('', extensionType, role, isLinked, viewSize);
+    const updatedViews = this.state.viewConfig[newView.id] = newView;
+    this.setState({
+      extensionViews: updatedViews,
+    });
+  }
+
+  createView(id, extensionType, role, isLinked, viewSize) {
+    return {
+      id: id || this._getNextId(),
+      type: extensionType,
+      extension: createExtensionObject(
+        this.state.manifest,
+        role,
+        isLinked,
+        this.state.userName,
+        this.state.channelId,
+        this.state.secret
+      ),
+      linked: isLinked,
+      role: role,
+      overlaySize: (viewSize.size === 'Custom' ? {width: viewSize.width, height: viewSize.height} : OverlaySizes[viewSize.size]),
+    };
+  }
+
+  createViews() {
+    const views = {};
     Object.keys(this.state.viewConfig).forEach((id, index) => {
       const config = this.state.viewConfig[id];
-      views.push({
-        id: id,
-        type: ReverseExtensionAnchors[config.viewType],
-        extension: createExtensionObject(
-          this.state.manifest,
-          config.role,
-          config.isLinked,
-          this.state.userName,
-          this.state.channelId,
-          this.state.secret
-        ),
-        linked: config.isLinked,
-        role: config.role,
-        overlaySize: (config.viewSize.size === 'Custom') ? {width: config.viewSize.width, height: config.viewSize.height} : OverlaySizes[config.viewSize.size],
-      });
+      views[id] = this.createView(id, ReverseExtensionAnchors[config.viewType], config.role, config.isLinked, config.viewSize);
     });
     return views;
   }
@@ -207,6 +219,14 @@ export class Rig extends Component {
     );
   }
 
+  _getNextId() {
+    let i = 0;
+    while (this.state.extensionViews[i]) {
+      i += 1;
+    }
+    return i;
+  }
+
   _getExtensionViews() {
     const extensionViewsValue = localStorage.getItem("extensionViews");
     return extensionViewsValue ? JSON.parse(extensionViewsValue) : extensionViewsValue;
@@ -220,7 +240,11 @@ export class Rig extends Component {
   }
 
   _deleteExtensionView(id) {
-    this._pushExtensionViews(this.state.extensionViews.filter(element => element.id !== id));
+    delete this.state.extensionViews[id];
+    this.setState({
+      extensionViews: this.state.extensionViews,
+    });
+    //this._pushExtensionViews(this.state.extensionViews.filter(element => element.id !== id));
   }
 
   _fetchInitialConfiguration() {

@@ -77,6 +77,8 @@ export class ExtensionViewDialog extends Component {
   }
 
   save = () => {
+    const linked = this.state.identityOption === IdentityOptions.Linked;
+    const viewType = this.state.extensionViewType;
     this.props.saveHandler();
   }
 

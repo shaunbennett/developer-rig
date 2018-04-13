@@ -24,7 +24,8 @@ export class ExtensionViewContainer extends Component {
 
     let extensionViews = [];
     if (this.props.extensionViews) {
-      extensionViews = this.props.extensionViews.map(view => {
+      extensionViews = Object.keys(this.props.extensionViews).map(id => {
+        const view = this.props.extensionViews[id];
         return <ExtensionView
           key={view.id}
           id={view.id}
