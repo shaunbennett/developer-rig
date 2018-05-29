@@ -87,7 +87,7 @@ describe('token', () => {
 
       expect(payload.opaque_user_id).toBe(LOGGED_OUT_PAYLOAD.opaque_user_id);
       expect(payload.role).toBe(LOGGED_OUT_PAYLOAD.role);
-      expect(payload.pubsub_perms.send).toBe(undefined);
+      expect(payload.pubsub_perms.send).toBeUndefined();
       expect(payload.pubsub_perms.listen).toEqual(['broadcast','global']);
     });
 
@@ -97,7 +97,7 @@ describe('token', () => {
 
       expect(payload.opaque_user_id).toBe(LOGGED_IN_UNLINKED_PAYLOAD.opaque_user_id);
       expect(payload.role).toBe(LOGGED_IN_UNLINKED_PAYLOAD.role);
-      expect(payload.pubsub_perms.send).toBe(undefined);
+      expect(payload.pubsub_perms.send).toBeUndefined();
       expect(payload.pubsub_perms.listen).toEqual(['broadcast','global']);
     });
 
@@ -108,7 +108,7 @@ describe('token', () => {
       expect(payload.opaque_user_id).toBe(LOGGED_IN_LINKED_PAYLOAD.opaque_user_id);
       expect(payload.user_id).toBe(LOGGED_IN_LINKED_PAYLOAD.user_id);
       expect(payload.role).toBe(LOGGED_IN_LINKED_PAYLOAD.role);
-      expect(payload.pubsub_perms.send).toBe(undefined);
+      expect(payload.pubsub_perms.send).toBeUndefined();
       expect(payload.pubsub_perms.listen).toEqual(['broadcast','global']);
     });
 
