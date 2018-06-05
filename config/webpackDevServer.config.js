@@ -94,6 +94,17 @@ module.exports = function(proxy, allowedHost) {
       // it used the same host and port.
       // https://github.com/facebookincubator/create-react-app/issues/2272#issuecomment-302832432
       app.use(noopServiceWorkerMiddleware());
+
+      // This is a custom endpoint for local mode.
+      app.get('/some/path', function(req, res) {
+        console.log('some path');
+        res.json({
+          clientId: process.env.EXT_CLIENT_ID,
+          version: process.env.EXT_VERSION,
+          channel: process.env.EXT_CHANNEL,
+          ownerName: process.env.EXT_OWNER_NAME,
+        });
+      });
     },
   };
 };
