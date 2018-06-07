@@ -37,7 +37,7 @@ window.addEventListener('message', e => {
       console.log('message received from unknown source');
     }
   } else if (e.data.action === 'tesst') {
-    var url = 'https://localhost.rig.twitch.tv:3000/some/path';
+    var url = 'https://localhost.rig.twitch.tv:3000/pubsub';
     var oReq = new XMLHttpRequest();
     oReq.addEventListener("load", function() { console.log(this.responseText); });
     oReq.addEventListener("error", function() { console.log('error:', this); });
