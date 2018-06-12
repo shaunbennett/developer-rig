@@ -107,14 +107,14 @@ choosePort(HOST, DEFAULT_PORT)
       return;
     }
 
-    // Create a handler for the custom endpoint for PubSub in local mode.
-    function localModeHandler(req, res) {
-      console.log('pubsub');
-      res.json({
-        clientId: process.env.EXT_CLIENT_ID,
-        version: process.env.EXT_VERSION,
-        channel: process.env.EXT_CHANNEL,
-        ownerName: process.env.EXT_OWNER_NAME,
+    // Create a call-back to configure the WebPack application.
+    function configureApp(app) {
+      // Create an endpoint for PubSub in local mode.
+      app.get('/pubsub', (req, res) => {
+        console.log('pubsub');
+        // TODO
+        res.writeHead(204);
+        res.end();
       });
     }
 
@@ -130,7 +130,7 @@ choosePort(HOST, DEFAULT_PORT)
     const serverConfig = createDevServerConfig(
       proxyConfig,
       urls.lanUrlForConfig,
-      localModeHandler
+      configureApp
     );
     const devServer = new WebpackDevServer(compiler, serverConfig);
     // Launch WebpackDevServer.

@@ -10,7 +10,7 @@ const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
 const host = process.env.HOST || '0.0.0.0';
 const pem = require('./env').getSSLCerts() || '';
 
-module.exports = function(proxy, allowedHost, localModeHandler) {
+module.exports = function(proxy, allowedHost, configureApp) {
   return {
     // WebpackDevServer 2.4.3 introduced a security fix that prevents remote
     // websites from potentially accessing local content through DNS rebinding:
@@ -95,8 +95,8 @@ module.exports = function(proxy, allowedHost, localModeHandler) {
       // https://github.com/facebookincubator/create-react-app/issues/2272#issuecomment-302832432
       app.use(noopServiceWorkerMiddleware());
 
-      // This is a custom endpoint for PubSub in local mode.
-      app.get('/pubsub', localModeHandler);
+      // Call back to configure the app.
+      configureApp(app);
     },
   };
 };
