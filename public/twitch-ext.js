@@ -29,6 +29,47 @@
         window.parent.parent.parent.postMessage({ action: "twitch-ext-rig-authorize" }, '*');
       }
     },
+    onError: fn => {
+      log('onError', fn);
+      errCallback = fn;
+    },
+    onContext: fn => {
+      log('onContext', fn);
+      contextCallback = fn;
+      context && contextCallback(context, contextChangedFields);
+      setTimeout(() => {
+        contextCallback({ "mode": "viewer", "language": "en", "theme": "light", "game": "", "playbackMode": "video" },
+          ["mode", "language", "theme", "game", "playbackMode"]);
+      });
+    },
+    onVisibilityChanged: fn => {
+      log('onVisibilityChanged', fn);
+      visibilityCallback = fn;
+      isVisible || visibilityCallback(false, null);
+    },
+    onPositionChange: fn => {
+      log('onPositionChange', fn);
+      positionCallback = fn;
+    },
+    actions: {
+      followChannel: channelName => { }, // TODO
+      onFollow: callback => { }, // TODO
+      requestIdShare: () => { }, // TODO
+    },
+    purchases: {
+      beginPurchase: null, // TODO
+      onReloadEntitlements: null, // TODO
+      getPrices: null, // TODO
+    },
+    bits: null, // TODO
+    rig: {
+      log: (message, ...optionalParams) => {
+        window.parent.postMessage({
+          action: 'twitch-ext-rig-log',
+          messages: [message, ...optionalParams],
+        }, '*');
+      }
+    },
   };
 
   function log(...args) {
