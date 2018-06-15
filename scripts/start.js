@@ -109,9 +109,16 @@ choosePort(HOST, DEFAULT_PORT)
 
     // Create a call-back to configure the WebPack application.
     function configureApp(app) {
-      // Create an endpoint for PubSub in local mode.
-      app.get('/pubsub', (req, res) => {
-        console.log('pubsub');
+      // Create endpoints for API in local mode.
+      app.get('/helix/users', (req, res) => {
+        const url = parseUrl(req.url, true);
+        console.log(`helix/users/${url.query.login}`);
+        // TODO
+        res.writeHead(200);
+        res.end("{\"data\":[]}");
+      });
+      app.get('/extensions/message/{channelId}', (req, res) => {
+        console.log(`extensions/message/${channelId}`);
         // TODO
         res.writeHead(204);
         res.end();
