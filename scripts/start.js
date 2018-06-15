@@ -145,8 +145,47 @@ choosePort(HOST, DEFAULT_PORT)
       openBrowser(urls.localUrlForBrowser);
     });
 
+    const options = {
+      key: fs.readFileSync('ssl/selfsigned.key'),
+      cert: fs.readFileSync('ssl/selfsigned.crt')
+    };
+    var socketServer = require('https').createServer(options, (req, res) => {
+      res.writeHead(200);
+      res.end("live");
+    });
+    var WebSocket = new require('ws');
+    var wss = new WebSocket.Server({ server: socketServer });
+    wss.on('connection', function(socket) {
+      console.log('connection', wss.clients.length);
+      socket.on('open', function() {
+        console.log('open');
+      });
+      socket.on('message', function(message) {
+        console.log('message:', message);
+        var data = JSON.parse(message);
+        if (data.type === 'PING') {
+          socket.send(JSON.stringify({ type: "PONG" }));
+          console.log('sent PONG');
+        } else {
+          wss.clients.forEach(function(client) {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(message);
+            }
+          });
+        }
+      });
+      socket.on('close', function(code, reason) {
+        console.log('close', code, reason);
+      });
+    });
+    socketServer.listen(3003, function() {
+      console.log('listening on *:3003');
+    });
+
     ['SIGINT', 'SIGTERM'].forEach(function(sig) {
       process.on(sig, function() {
+        wss.close();
+        socketServer.close();
         devServer.close();
         process.exit();
       });
