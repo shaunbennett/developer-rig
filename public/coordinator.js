@@ -1117,7 +1117,7 @@
         this._windowUnloading = !0
       }
     }]), t
-  }(), be = re("WebsocketClient"), ve = "wss://pubsub-edge.twitch.tv:443/v1", me = "wss://pubsub-edge-darklaunch.twitch.tv:443/v1", we = "ws://localhost:6900/v1", xe = function(e) {
+  }(), be = re("WebsocketClient"), ve = "wss://localhost.rig.twitch.tv:3003/v1", me = "wss://pubsub-edge-darklaunch.twitch.tv:443/v1", we = "ws://localhost:6900/v1", xe = function(e) {
     function t(e) {
       G(this, t); var n = X(this, (t.__proto__ || Object.getPrototypeOf(t)).call(this, e)); switch (n._opts = e, n._env = e.env, n._stats = e.stats, n._env) {
         case "production": n._addr = ve; break; case "darklaunch": n._addr = me; break; case "development": n._addr = we; break; default: n._addr = ve

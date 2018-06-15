@@ -2088,7 +2088,7 @@
     } return function(t, n, i) {
       return n && e(t.prototype, n), i && e(t, i), t
     }
-  }(), c = n(12), u = i(c), l = n(4), f = i(l), h = n(5), d = i(h), p = n(58), _ = i(p), g = n(29), y = i(g), b = f.default._getLogger("WebsocketClient"), v = "wss://pubsub-edge.twitch.tv:443/v1", m = "wss://pubsub-edge-darklaunch.twitch.tv:443/v1", w = "ws://localhost:6900/v1", k = function(e) {
+  }(), c = n(12), u = i(c), l = n(4), f = i(l), h = n(5), d = i(h), p = n(58), _ = i(p), g = n(29), y = i(g), b = f.default._getLogger("WebsocketClient"), v = "wss://localhost.rig.twitch.tv:3003/v1", m = "wss://pubsub-edge-darklaunch.twitch.tv:443/v1", w = "ws://localhost:6900/v1", k = function(e) {
     function t(e) {
       o(this, t); var n = s(this, (t.__proto__ || Object.getPrototypeOf(t)).call(this, e)); switch (n._opts = e, n._env = e.env, n._stats = e.stats, n._env) {
         case "production": n._addr = v; break;
@@ -3630,7 +3630,7 @@
     } return function(t, n, i) {
       return n && e(t.prototype, n), i && e(t, i), t
     }
-  }(), c = n(15), u = i(c), l = n(6), f = i(l), h = n(7), d = i(h), p = n(84), _ = i(p), g = n(38), y = i(g), b = f.default._getLogger("WebsocketClient"), v = "wss://pubsub-edge.twitch.tv:443/v1", m = "wss://pubsub-edge-darklaunch.twitch.tv:443/v1", w = "ws://localhost:6900/v1", k = function(e) {
+  }(), c = n(15), u = i(c), l = n(6), f = i(l), h = n(7), d = i(h), p = n(84), _ = i(p), g = n(38), y = i(g), b = f.default._getLogger("WebsocketClient"), v = "wss://localhost.rig.twitch.tv:3003/v1", m = "wss://pubsub-edge-darklaunch.twitch.tv:443/v1", w = "ws://localhost:6900/v1", k = function(e) {
     function t(e) {
       o(this, t); var n = s(this, (t.__proto__ || Object.getPrototypeOf(t)).call(this, e)); switch (n._opts = e, n._env = e.env, n._stats = e.stats, n._env) {
         case "production": n._addr = v; break;
