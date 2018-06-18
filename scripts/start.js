@@ -109,6 +109,15 @@ choosePort(HOST, DEFAULT_PORT)
 
     // Create a call-back to configure the WebPack application.
     function configureApp(app) {
+      const channelId = process.env.EXT_CHANNEL;
+      const parseQuerystring = require('querystring').parse;
+      const parseUrl = require('url').parse;
+      const dateFormat = require('dateformat');
+      const clientId = process.env.EXT_CLIENT_ID;
+      let sequenceNumber = 0;
+
+      app.use(require('body-parser').json());
+
       // Create endpoints for API in local mode.
       app.get('/helix/users', (req, res) => {
         const url = parseUrl(req.url, true);
@@ -117,9 +126,22 @@ choosePort(HOST, DEFAULT_PORT)
         res.writeHead(200);
         res.end("{\"data\":[]}");
       });
-      app.get('/extensions/message/{channelId}', (req, res) => {
-        console.log(`extensions/message/${channelId}`);
-        // TODO
+      app.post('/extensions/message/:channelId', (req, res) => {
+        console.log(`extensions/message/${req.params.channelId}`, req.body);
+        let message = {
+          time_sent: dateFormat(new Date(), "isoUtcDateTime"),
+          content_type: req.body.content_type,
+          content: [req.body.message],
+          sequence: { number: ++sequenceNumber, start: '2018-06-18T17:32:55Z' },
+        };
+        message = {
+          type: 'MESSAGE',
+          data: {
+            topic: `channel-ext-v1.${req.params.channelId}-${clientId}-broadcast`,
+            message: JSON.stringify(message) + "\r\n",
+          }
+        };
+        broadcast(JSON.stringify(message));
         res.writeHead(204);
         res.end();
       });
@@ -156,12 +178,12 @@ choosePort(HOST, DEFAULT_PORT)
       key: fs.readFileSync('ssl/selfsigned.key'),
       cert: fs.readFileSync('ssl/selfsigned.crt')
     };
-    var socketServer = require('https').createServer(options, (req, res) => {
+    const socketServer = require('https').createServer(options, (req, res) => {
       res.writeHead(200);
       res.end("live");
     });
-    var WebSocket = new require('ws');
-    var wss = new WebSocket.Server({ server: socketServer });
+    const WebSocket = new require('ws');
+    const wss = new WebSocket.Server({ server: socketServer });
     wss.on('connection', function(socket) {
       console.log('connection', wss.clients.length);
       socket.on('open', function() {
@@ -169,7 +191,7 @@ choosePort(HOST, DEFAULT_PORT)
       });
       socket.on('message', function(message) {
         console.log('message:', message);
-        var data = JSON.parse(message);
+        const data = JSON.parse(message);
         if (data.type === 'PING') {
           socket.send(JSON.stringify({ type: "PONG" }));
           console.log('sent PONG');
@@ -188,6 +210,13 @@ choosePort(HOST, DEFAULT_PORT)
     socketServer.listen(3003, function() {
       console.log('listening on *:3003');
     });
+    function broadcast(data) {
+      wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(data);
+        }
+      });
+    }
 
     ['SIGINT', 'SIGTERM'].forEach(function(sig) {
       process.on(sig, function() {
