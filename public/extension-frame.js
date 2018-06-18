@@ -11,8 +11,6 @@ function proxyIframeEvent(event) {
       extension.dobbin = { trackEvent: () => {} };
       extensionFrameAPI = new ExtensionFrame(extension);
       break;
-    case 'tesst':
-      console.log('forwarding tesst');
     case 'twitch-ext-rig-log':
       window.parent.postMessage(data, '*');
       break;

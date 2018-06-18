@@ -36,12 +36,16 @@ window.addEventListener('message', e => {
     } else {
       console.log('message received from unknown source');
     }
-  } else if (e.data.action === 'tesst') {
-    var url = 'https://localhost.rig.twitch.tv:3000/pubsub';
-    var oReq = new XMLHttpRequest();
-    oReq.addEventListener("load", function() { console.log(this.responseText); });
-    oReq.addEventListener("error", function() { console.log('error:', this); });
-    oReq.open("GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime());
-    oReq.send(null);
+  } else if(e.data.action === 'twitch-ext-rig-authorize') {
+    console.log('got twitch-ext-rig-authorize');
+    sendToService('authorize', null, response => {
+      console.log("authorize response:", JSON.stringify(response));
+      e.source.postMessage({ action: "twitch-ext-rig-authorize-response", response }, e.origin);
+    });
+  } else if (e.data.action === 'twitch-ext-rig-pubsub') {
+    const {target, contentType, message} = e.data;
+    sendToService('pubsub', {target, contentType, message}, () => {
+      console.log('sent to pubsub');
+    });
   }
 });
