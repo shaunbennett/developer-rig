@@ -21,8 +21,7 @@
         let message = JSON.parse(event.data);
         if (message.type === 'MESSAGE') {
           const [channelId, clientId, target] = message.data.topic.split('.').pop().split('-');
-          // TODO:  validate
-          if (channelId && clientId) {
+          if (authData.channelId === channelId && authData.clientId === clientId) {
             const targetListeners = listeners[target];
             if (targetListeners) {
               message = JSON.parse(message.data.message);
@@ -33,7 +32,8 @@
           }
         }
       });
-      authData = event.data.response;
+      authData = Object.assign({}, event.data.response);
+      log('received auth data:', authData);
       authCallback(authData);
       window.parent.postMessage({ action: 'on-authorized' }, '*');
     }
@@ -45,7 +45,7 @@
       log('onAuthorized', fn);
       authCallback = fn;
       if (authData) {
-        log('received auth data:', authData);
+        log('started with auth data:', authData);
         authCallback(authData);
       } else {
         log('sending twitch-ext-rig-authorize');
@@ -74,6 +74,10 @@
       log('onPositionChange', fn);
       positionCallback = fn;
     },
+    send: (target, contentType, message) => {
+      log('send', target, contentType, message);
+      window.parent.parent.parent.postMessage({ action: "twitch-ext-rig-pubsub", channelId: authData.channelId, target, contentType, message }, '*');
+    },
     listen: (target, callback) => {
       log('listen', target, callback);
       let targetListeners = listeners[target];
@@ -81,6 +85,20 @@
         listeners[target] = [callback];
       } else if (!~targetListeners.indexOf(callback)) {
         targetListeners.push(callback);
+      }
+    },
+    unlisten: (target, callback) => {
+      let targetListeners = listeners[target];
+      if (!targetListeners) {
+        return;
+      }
+      let index = targetListeners.indexOf(callback);
+      if (~index) {
+        if (targetListeners.length === 1) {
+          delete listeners[target];
+        } else {
+          targetListeners.splice(index, 1);
+        }
       }
     },
     actions: {

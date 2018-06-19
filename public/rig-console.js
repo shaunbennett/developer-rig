@@ -43,8 +43,8 @@ window.addEventListener('message', e => {
       e.source.postMessage({ action: "twitch-ext-rig-authorize-response", response }, e.origin);
     });
   } else if (e.data.action === 'twitch-ext-rig-pubsub') {
-    const {target, contentType, message} = e.data;
-    sendToService('pubsub', {target, contentType, message}, () => {
+    const {channelId, target, contentType, message} = e.data;
+    sendToService(`extensions/message/${channelId}`, { targets: [target], content_type: contentType, message}, () => {
       console.log('sent to pubsub');
     });
   }

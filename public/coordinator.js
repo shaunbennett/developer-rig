@@ -1,8 +1,6 @@
-//debugger;
 window['extension-coordinator'] = {
   ExtensionFrame: function(extension) { },
 };
-//window['extension-coordinator'].ExtensionFrame = function(params) { };
 
 const CONFIG_FRAME_HEIGHT = 700;
 const DEFAULT_FRAME_HEIGHT = 300;
