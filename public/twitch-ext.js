@@ -11,7 +11,7 @@
 
   window.addEventListener("message", event => {
     log("on-message", event.origin, event.data && event.data.action);
-    if (event.data && event.data.action === "twitch-ext-rig-authorize-response") {
+    if (event.data && event.data.action === "extension-frame-authorize-response") {
       webSocket = new WebSocket("wss://localhost.rig.twitch.tv:3003");
       webSocket.addEventListener('open', function(event) {
         console.log('web socket open');
@@ -35,7 +35,6 @@
       authData = Object.assign({}, event.data.response);
       log('received auth data:', authData);
       authCallback(authData);
-      window.parent.postMessage({ action: 'on-authorized' }, '*');
     }
   });
 
@@ -48,8 +47,8 @@
         log('started with auth data:', authData);
         authCallback(authData);
       } else {
-        log('sending twitch-ext-rig-authorize');
-        window.parent.parent.parent.postMessage({ action: "twitch-ext-rig-authorize" }, '*');
+        log('sending extension-frame-authorize');
+        window.parent.postMessage({ action: "extension-frame-authorize" }, '*');
       }
     },
     onError: fn => {
@@ -76,7 +75,7 @@
     },
     send: (target, contentType, message) => {
       log('send', target, contentType, message);
-      window.parent.parent.parent.postMessage({ action: "twitch-ext-rig-pubsub", channelId: authData.channelId, target, contentType, message }, '*');
+      window.parent.parent.postMessage({ action: "extension-frame-pubsub", channelId: authData.channelId, target, contentType, message }, '*');
     },
     listen: (target, callback) => {
       log('listen', target, callback);
@@ -114,7 +113,7 @@
     bits: null, // TODO
     rig: {
       log: (message, ...optionalParams) => {
-        window.parent.postMessage({
+        window.parent.parent.postMessage({
           action: 'twitch-ext-rig-log',
           messages: [message, ...optionalParams],
         }, '*');

@@ -1,5 +1,5 @@
 window['extension-coordinator'] = {
-  ExtensionFrame: function(extension) { },
+  ExtensionFrame: function(parameters) { },
 };
 
 const CONFIG_FRAME_HEIGHT = 700;
@@ -62,10 +62,10 @@ const supervisor = {
   supervisorURL: "supervisor.html", // TODO
 };
 
-window['extension-coordinator'].ExtensionFrame = function(params) {
-  const extension = Object.assign(params.extension, {
-    panelHeight: params.extension.views.panel && params.extension.views.panel.height,
-    isMonetized: params.extension.sku && params.extension.vendorCode,
+window['extension-coordinator'].ExtensionFrame = function(parameters) {
+  const extension = Object.assign(parameters.extension, {
+    panelHeight: parameters.extension.views.panel && parameters.extension.views.panel.height,
+    isMonetized: parameters.extension.sku && parameters.extension.vendorCode,
     getViewerUrlForContext: function(platform, mode, anchor) {
       let viewerUrl = '';
       switch (platform) {
@@ -106,23 +106,23 @@ window['extension-coordinator'].ExtensionFrame = function(params) {
       }
     },
   });
-  params = Object.assign(params, {
+  parameters = Object.assign(parameters, {
     platform: ExtensionPlatform.Web,
-    mode: params.platform === ExtensionPlatform.Mobile ? ExtensionMode.Viewer : params.mode,
+    mode: parameters.platform === ExtensionPlatform.Mobile ? ExtensionMode.Viewer : parameters.mode,
   });
   const extensionOptions = {
-    anchor: params.anchor,
+    anchor: parameters.anchor,
     language: 'en',
-    mode: params.mode,
+    mode: parameters.mode,
     state: ExtensionStateMap[extension.state],
-    platform: params.platform,
+    platform: parameters.platform,
   };
-  const iframe = createSupervisorIFrame(params.iframeClassName, params.anchor, extensionOptions);
+  const iframe = createSupervisorIFrame(parameters.iframeClassName, parameters.anchor, extensionOptions);
   setupListeners();
-  params.parentElement.appendChild(iframe);
+  parameters.parentElement.appendChild(iframe);
 
   function createSupervisorIFrame(className, anchor, options) {
-    const { mode } = params;
+    const { mode } = parameters;
     const iframe = document.createElement('iframe');
 
     iframe.setAttribute('class', className);
@@ -175,12 +175,12 @@ window['extension-coordinator'].ExtensionFrame = function(params) {
       const { source, data } = event;
       if (data.action === SupervisorAction.SupervisorReady) {
         initSupervisedExtension();
-      } else if (data.action === 'on-authorized') {
+      } else if (data.action === 'extension-frame-authorize') {
         iframe.style.removeProperty('display');
       }
 
       function initSupervisedExtension() {
-        const { anchor, mode } = params;
+        const { anchor, mode } = parameters;
         const { platform } = extensionOptions;
         const extensionUrl = extension.getViewerUrlForContext(platform, mode, anchor);
         let sandboxWhitelist;
@@ -211,7 +211,7 @@ window['extension-coordinator'].ExtensionFrame = function(params) {
           const originalParams = query.split('&').filter((str) => str.length > 0);
           const urlWithoutQuery = originalParams.length > 0 ? url.slice(0, url.length - query.length - 1) : url;
           const keys = Object.keys(options);
-          const params = keys.reduce((fields, key) => {
+          const queryParameters = keys.reduce((fields, key) => {
             const value = options[key];
             if (value) {
               fields.push(`${encodeURIComponent(key)}=${encodeURIComponent(value.toString())}`);
@@ -219,7 +219,7 @@ window['extension-coordinator'].ExtensionFrame = function(params) {
 
             return fields;
           }, originalParams);
-          return params.length > 0 ? `${urlWithoutQuery}?${params.join('&')}` : url;
+          return queryParameters.length > 0 ? `${urlWithoutQuery}?${queryParameters.join('&')}` : url;
         }
 
         function sendSupervisorInit(options) {
@@ -242,7 +242,7 @@ window['extension-coordinator'].ExtensionFrame = function(params) {
 
   function getAnchorAttributes() {
     const iframeAttrs = {};
-    switch (params.anchor) {
+    switch (parameters.anchor) {
       case ExtensionAnchor.Panel:
         if (extensionOptions.platform === ExtensionPlatform.Mobile) {
           iframeAttrs.style = 'height: 100%;';
@@ -261,14 +261,14 @@ window['extension-coordinator'].ExtensionFrame = function(params) {
 
     function getDefaultAnchorAttributes() {
       const result = {};
-      if (params.mode === ExtensionMode.Viewer && extensionOptions.platform !== ExtensionPlatform.Mobile) {
+      if (parameters.mode === ExtensionMode.Viewer && extensionOptions.platform !== ExtensionPlatform.Mobile) {
         result.scrolling = 'no';
       }
       return result;
     }
 
     function getExtensionHeight() {
-      const { mode } = params;
+      const { mode } = parameters;
       const panelHeight = extension.panelHeight;
       if (mode === ExtensionMode.Config) {
         return CONFIG_FRAME_HEIGHT;
