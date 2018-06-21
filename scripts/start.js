@@ -11,6 +11,10 @@ const cmdOptions = commandLineArgs([
   }, {
     name: 'config',
     alias: 'c',
+  }, {
+    name: 'local',
+    alias: 'l',
+    type: Boolean,
   },
 ]);
 // Do this as the first thing so that any code reading it knows the right env.
@@ -20,6 +24,13 @@ process.env.NODE_ENV = 'development';
 // Set the extension secret as an environment variable if it was passed in via command line args
 if (cmdOptions.secret) {
   process.env.EXT_SECRET = cmdOptions.secret;
+}
+
+// Set local mode, if requested.
+if (cmdOptions.local) {
+  process.env.COORDINATOR_URL = "https://localhost.rig.twitch.tv:3000/coordinator.js";
+} else {
+  process.env.COORDINATOR_URL = "https://extension-files.twitch.tv/coordinator/7.7.0/extension-coordinator.umd.js";
 }
 
 let configFileLocation = null;

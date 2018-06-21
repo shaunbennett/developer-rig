@@ -89,6 +89,7 @@ function getClientEnvironment(publicUrl) {
   raw['EXT_VERSION'] = process.env.EXT_VERSION || '';
   raw['EXT_CHANNEL_ID'] = process.env.EXT_CHANNEL || '';
   raw['EXT_USER_NAME'] = process.env.EXT_OWNER_NAME || '';
+  raw['COORDINATOR_URL'] = process.env.COORDINATOR_URL || '';
 
   // Stringify all values so we can feed into Webpack DefinePlugin
   const stringified = {
