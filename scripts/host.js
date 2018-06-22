@@ -1,13 +1,15 @@
+const fs = require('fs');
 const http = require("http-server");
 
 const optionDefinitions = [
-  { name: "local_dir", alias: "l", type: String },
+  { name: "directory", alias: "d", type: String },
   { name: "port", alias: "p", type: Number, defaultValue: 8080 },
+  { name: "local", alias: "l", type: Boolean },
   { name: "help", alias: "h" },
 ]
 
 function usageAndExit() {
-  console.log("Usage: node host.js -l [local_dir] -p [port]")
+  console.log("Usage: node host.js -d [directory] -p [port] [-l]")
   process.exit(0)
 }
 
@@ -25,11 +27,11 @@ function logRequest(req, res, error) {
 if (require.main === module) {
   const cli = require("command-line-args");
   const args = cli(optionDefinitions);
-  if (args["local_dir"] === undefined || "help" in args) {
+  if (args["directory"] === undefined || "help" in args) {
     usageAndExit();
   }
 
-  const root = args["local_dir"];
+  const root = args["directory"];
   const port = args["port"];
   const options = {
     host: 'localhost.rig.twitch.tv',
@@ -41,6 +43,15 @@ if (require.main === module) {
     },
     logFn: logRequest,
   };
+
+  // Copy files from the appropriate sub-directory, if necessary and available.
+  const subDirectory = root + '/' + (args.local ? 'local' : 'online');
+  if (fs.existsSync(subDirectory)) {
+    const fileNames = fs.readdirSync(subDirectory);
+    fileNames.forEach(fileName => {
+      fs.copyFileSync(subDirectory + '/' + fileName, root + '/' + fileName);
+    });
+  }
 
   const server = http.createServer(options)
   server.listen(port, function() {
