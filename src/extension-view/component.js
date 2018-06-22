@@ -17,6 +17,7 @@ export class ExtensionView extends Component {
 
     this.state = {
       mousedOver: false,
+      key:Date.now()
     };
   }
 
@@ -32,12 +33,17 @@ export class ExtensionView extends Component {
     });
   }
 
+  forceRender(){
+    this.setState({key:Date.now()});
+  }
+
   renderView(extensionProps) {
     let view = null;
     switch (this.props.type) {
       case ExtensionAnchor.Component:
         view = (<ExtensionComponentView
           id={`component-${this.props.id}`}
+          key={this.state.key}
           className="view"
           frameId={`frameid-${this.props.id}`}
           extension={this.props.extension}
@@ -48,6 +54,7 @@ export class ExtensionView extends Component {
       case ExtensionViewType.Mobile:
         view = (<ExtensionMobileView
           id={`mobile-${this.props.id}`}
+          key={this.state.key}
           className="view"
           frameId={`frameid-${this.props.id}`}
           extension={this.props.extension}
@@ -62,6 +69,7 @@ export class ExtensionView extends Component {
           className="view"
           style={extensionProps.viewStyles}>
           <ExtensionFrame
+            key={this.state.key}
             className="view"
             frameId={`frameid-${this.props.id}`}
             extension={this.props.extension}
@@ -139,6 +147,9 @@ export class ExtensionView extends Component {
                 onClick={() => { this.props.openEditViewHandler(this.props.id) }}>
                 Edit
                 </div>}
+                <div className={'view__refresh_button'} onClick={()=>this.forceRender()} type={'button'}>
+                Refresh
+              </div>
             </div>
           )
           }
