@@ -6,16 +6,16 @@ const optionDefinitions = [
   { name: "port", alias: "p", type: Number, defaultValue: 8080 },
   { name: "local", alias: "l", type: Boolean },
   { name: "help", alias: "h" },
-]
+];
 
 function usageAndExit() {
-  console.log("Usage: node host.js -d [directory] -p [port] [-l]")
-  process.exit(0)
+  console.log("Usage: node host.js -d [directory] -p [port] [-l]");
+  process.exit(0);
 }
 
 function logRequest(req, res, error) {
   const date = "[" + new Date().toUTCString() + "]";
-  const requestLog = "\"" + req.method + " " + req.url + "\""
+  const requestLog = "\"" + req.method + " " + req.url + "\"";
   if (error) {
     console.log(date + "ERROR: " + requestLog);
     console.log(error);
@@ -39,13 +39,13 @@ if (require.main === module) {
     cache: -1,
     https: {
       cert: "./ssl/selfsigned.crt",
-      key: "./ssl/selfsigned.key"
+      key: "./ssl/selfsigned.key",
     },
     logFn: logRequest,
   };
 
   // Copy files from the appropriate sub-directory, if necessary and available.
-  const subDirectory = root + '/' + (args.local ? 'local' : 'online');
+  const subDirectory = `${root}/${args.local ? 'local' : 'online'}`;
   if (fs.existsSync(subDirectory)) {
     const fileNames = fs.readdirSync(subDirectory);
     fileNames.forEach(fileName => {

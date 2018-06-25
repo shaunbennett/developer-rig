@@ -26,13 +26,6 @@ if (cmdOptions.secret) {
   process.env.EXT_SECRET = cmdOptions.secret;
 }
 
-// Set local mode, if requested.
-if (cmdOptions.local) {
-  process.env.COORDINATOR_URL = "https://localhost.rig.twitch.tv:3000/coordinator.js";
-} else {
-  process.env.COORDINATOR_URL = "https://extension-files.twitch.tv/coordinator/7.7.0/extension-coordinator.umd.js";
-}
-
 let configFileLocation = null;
 
 if (cmdOptions.config) {
@@ -56,6 +49,35 @@ if (cmdOptions.config) {
     );
   }
 }
+
+// Set local mode, if requested.
+if (cmdOptions.local) {
+  process.env.COORDINATOR_URL = "https://localhost.rig.twitch.tv:3000/coordinator.js";
+  process.env.API_HOST = "localhost.rig.twitch.tv:3000";
+  if (!process.env.EXT_CLIENT_ID) {
+    process.env.EXT_CLIENT_ID = "u4u4u4u4u4u4u4u4u4u4u4u4u4u4u4";
+  }
+  if (!process.env.EXT_VERSION) {
+    process.env.EXT_VERSION = "0.0.1";
+  }
+  if (!process.env.EXT_CHANNEL) {
+    process.env.EXT_CHANNEL = "RIGtwitchrig";
+  }
+  if (!process.env.EXT_OWNER_NAME) {
+    process.env.EXT_OWNER_NAME = "twitchrig";
+  }
+  if (!process.env.EXT_SECRET) {
+    process.env.EXT_SECRET = "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk";
+  }
+} else {
+  process.env.COORDINATOR_URL = "https://extension-files.twitch.tv/coordinator/7.7.0/extension-coordinator.umd.js";
+  process.env.API_HOST = "api.twitch.tv";
+}
+console.log('clientId:', process.env.EXT_CLIENT_ID);
+console.log('version:', process.env.EXT_VERSION);
+console.log('channel:', process.env.EXT_CHANNEL);
+console.log('owner name:', process.env.EXT_OWNER_NAME);
+console.log('secret:', process.env.EXT_SECRET);
 
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
@@ -120,6 +142,10 @@ choosePort(HOST, DEFAULT_PORT)
 
     // Create a call-back to configure the WebPack application.
     function configureApp(app) {
+      if (!cmdOptions.local) {
+        // Do nothing if not in local mode.
+        return;
+      }
       const channelId = process.env.EXT_CHANNEL;
       const parseQuerystring = require('querystring').parse;
       const parseUrl = require('url').parse;
@@ -131,11 +157,80 @@ choosePort(HOST, DEFAULT_PORT)
 
       // Create endpoints for API in local mode.
       app.get('/helix/users', (req, res) => {
+        // TODO:  check request headers for client identifier.
         const url = parseUrl(req.url, true);
         console.log(`helix/users/${url.query.login}`);
-        // TODO
+        res.setHeader('Content-Type', '');
         res.writeHead(200);
-        res.end("{\"data\":[]}");
+        const data = {
+          "data": [
+            {
+              "id": "000000000",
+              "login": url.query.login,
+              "display_name": url.query.login,
+              "type": "",
+              "broadcaster_type": "",
+              "description": "",
+              "profile_image_url": "https://static-cdn.jtvnw.net/user-default-pictures/49988c7b-57bc-4dee-bd4f-6df4ad215d3a-profile_image-300x300.jpg",
+              "offline_image_url": "",
+              "view_count": 1,
+            },
+          ],
+        };
+        res.end(JSON.stringify(data));
+      });
+      app.post('/kraken/extensions/search', (req, res) => {
+        // TODO:  check request headers for client identifier and JWT authorization.
+        const url = parseUrl(req.url, true);
+        console.log(typeof req.body);
+        console.log(req.body);
+        const search = req.body;
+        console.log(search.limit);
+        res.setHeader('Content-Type', '');
+        res.writeHead(200);
+        const data = {
+          "_total": 1,
+          "extensions": [
+            {
+              "id": process.env.EXT_CLIENT_ID,
+              "state": "Testing",
+              "version": process.env.EXT_VERSION,
+              "anchor": "",
+              "panel_height": 300,
+              "author_name": process.env.EXT_OWNER_NAME,
+              "support_email": "info@deluxetingler.net",
+              "name": "Tingler",
+              "description": "The Tingler is a 1959 American horror/thriller film produced and directed by William Castle. It is the third of five collaborations between Castle and writer Robb White, and stars Vincent Price, Darryl Hickman, Patricia Cutts, Pamela Lincoln, Philip Coolidge, and Judith Evelyn.",
+              "summary": "1959 American horror/thriller film",
+              "viewer_url": "https://localhost.rig.twitch.tv:8080/panel.html",
+              "viewer_urls": { "panel": "https://localhost.rig.twitch.tv:8080/panel.html" },
+              "views": {
+                "panel": {
+                  "viewer_url": "https://localhost.rig.twitch.tv:8080/panel.html",
+                  "height": 300
+                },
+                "config": { "viewer_url": "https://localhost.rig.twitch.tv:8080/config.html" }
+              },
+              "config_url": "https://localhost.rig.twitch.tv:8080/config.html",
+              "live_config_url": "",
+              "icon_url": "https://media.forgecdn.net/avatars/154/735/636628000230800019.png",
+              "icon_urls": { "100x100": "https://media.forgecdn.net/avatars/154/735/636628000230800019.png" },
+              "screenshot_urls": ["internal/screenshots/test_data.png"],
+              "asset_urls": null,
+              "installation_count": -42,
+              "can_install": true,
+              "whitelisted_panel_urls": [],
+              "whitelisted_config_urls": [],
+              "required_broadcaster_abilities": [],
+              "eula_tos_url": "",
+              "privacy_policy_url": "",
+              "request_identity_link": false,
+              "vendor_code": "",
+              "sku": "",
+              "bits_enabled": false
+            }]
+        };
+        res.end(JSON.stringify(data));
       });
       app.post('/extensions/message/:channelId', (req, res) => {
         console.log(`extensions/message/${req.params.channelId}`, req.body);
