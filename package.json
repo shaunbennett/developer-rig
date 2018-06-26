@@ -68,6 +68,7 @@
     "ws": "^5.2.0"
   },
   "scripts": {
+    "create-manifest": "node scripts/create-manifest.js",
     "start": "node ./scripts/ssl.js && cross-env HOST=localhost.rig.twitch.tv HTTPS=true node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
