@@ -1,15 +1,16 @@
-const fs = require('fs');
+const fs = require("fs");
 const http = require("http-server");
 
 const optionDefinitions = [
   { name: "directory", alias: "d", type: String },
   { name: "port", alias: "p", type: Number, defaultValue: 8080 },
+  { name: "rig_port", alias: "r", type: Number, defaultValue: 3000 },
   { name: "local", alias: "l", type: Boolean },
   { name: "help", alias: "h" },
 ];
 
 function usageAndExit() {
-  console.log("Usage: node host.js -d [directory] -p [port] [-l]");
+  console.log("Usage: node host.js -d directory [-p port] [-r rig-port] [-l]");
   process.exit(0);
 }
 
@@ -34,7 +35,7 @@ if (require.main === module) {
   const root = args["directory"];
   const port = args["port"];
   const options = {
-    host: 'localhost.rig.twitch.tv',
+    host: "localhost.rig.twitch.tv",
     root: root,
     cache: -1,
     https: {
@@ -45,11 +46,17 @@ if (require.main === module) {
   };
 
   // Copy files from the appropriate sub-directory, if necessary and available.
-  const subDirectory = `${root}/${args.local ? 'local' : 'online'}`;
+  const subDirectory = `${root}/${args.local ? "local" : "online"}`;
   if (fs.existsSync(subDirectory)) {
     const fileNames = fs.readdirSync(subDirectory);
     fileNames.forEach(fileName => {
-      fs.copyFileSync(subDirectory + '/' + fileName, root + '/' + fileName);
+      if (args.local) {
+        let fileText = fs.readFileSync(root + "/local/" + fileName, "utf8");
+        fileText = fileText.replace("%PORT%", args.rig_port);
+        fs.writeFileSync(root + "/" + fileName, fileText, "utf8");
+      } else {
+        fs.copyFileSync(root + "/online/" + fileName, root + "/" + fileName);
+      }
     });
   }
 

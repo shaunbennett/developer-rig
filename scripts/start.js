@@ -14,23 +14,24 @@ const cmdOptions = commandLineArgs([
   }, {
     name: 'local',
     alias: 'l',
-    type: Boolean,
   },
 ]);
 // Do this as the first thing so that any code reading it knows the right env.
 process.env.BABEL_ENV = 'development';
 process.env.NODE_ENV = 'development';
 
+// Tools like Cloud9 rely on this.
+const HOST = process.env.HOST || '0.0.0.0';
+const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
+
 // Set the extension secret as an environment variable if it was passed in via command line args
 if (cmdOptions.secret) {
   process.env.EXT_SECRET = cmdOptions.secret;
 }
 
-let configFileLocation = null;
-
 if (cmdOptions.config) {
   try {
-    configFileLocation = path.resolve(process.cwd(), cmdOptions.config);
+    const configFileLocation = path.resolve(process.cwd(), cmdOptions.config);
     const configFile = fs.readFileSync(configFileLocation, 'utf-8');
     // Pull config variables from file and set them to environment variables
     const { clientID, version, channel, ownerName } = JSON.parse(configFile);
@@ -51,20 +52,23 @@ if (cmdOptions.config) {
 }
 
 // Set local mode, if requested.
+let extension;
 if (cmdOptions.local) {
-  process.env.COORDINATOR_URL = "https://localhost.rig.twitch.tv:3000/coordinator.js";
-  process.env.API_HOST = "localhost.rig.twitch.tv:3000";
+  const localFileLocation = path.resolve(process.cwd(), cmdOptions.local);
+  const { id: clientId, version, author_name: ownerName } = extension = require(localFileLocation);
+  process.env.API_HOST = `localhost.rig.twitch.tv:${DEFAULT_PORT}`;
+  process.env.COORDINATOR_URL = `https://${process.env.API_HOST}/coordinator.js`;
   if (!process.env.EXT_CLIENT_ID) {
-    process.env.EXT_CLIENT_ID = "u4u4u4u4u4u4u4u4u4u4u4u4u4u4u4";
+    process.env.EXT_CLIENT_ID = clientId;
   }
   if (!process.env.EXT_VERSION) {
-    process.env.EXT_VERSION = "0.0.1";
+    process.env.EXT_VERSION = version;
   }
   if (!process.env.EXT_CHANNEL) {
-    process.env.EXT_CHANNEL = "RIGtwitchrig";
+    process.env.EXT_CHANNEL = "RIG" + ownerName;
   }
   if (!process.env.EXT_OWNER_NAME) {
-    process.env.EXT_OWNER_NAME = "twitchrig";
+    process.env.EXT_OWNER_NAME = ownerName;
   }
   if (!process.env.EXT_SECRET) {
     process.env.EXT_SECRET = "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk";
@@ -111,10 +115,6 @@ const isInteractive = process.stdout.isTTY;
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
   process.exit(1);
 }
-
-// Tools like Cloud9 rely on this.
-const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
-const HOST = process.env.HOST || '0.0.0.0';
 
 if (process.env.HOST) {
   console.log(
@@ -189,46 +189,8 @@ choosePort(HOST, DEFAULT_PORT)
         res.setHeader('Content-Type', '');
         res.writeHead(200);
         const data = {
-          "_total": 1,
-          "extensions": [
-            {
-              "id": process.env.EXT_CLIENT_ID,
-              "state": "Testing",
-              "version": process.env.EXT_VERSION,
-              "anchor": "",
-              "panel_height": 300,
-              "author_name": process.env.EXT_OWNER_NAME,
-              "support_email": "info@deluxetingler.net",
-              "name": "Tingler",
-              "description": "The Tingler is a 1959 American horror/thriller film produced and directed by William Castle. It is the third of five collaborations between Castle and writer Robb White, and stars Vincent Price, Darryl Hickman, Patricia Cutts, Pamela Lincoln, Philip Coolidge, and Judith Evelyn.",
-              "summary": "1959 American horror/thriller film",
-              "viewer_url": "https://localhost.rig.twitch.tv:8080/panel.html",
-              "viewer_urls": { "panel": "https://localhost.rig.twitch.tv:8080/panel.html" },
-              "views": {
-                "panel": {
-                  "viewer_url": "https://localhost.rig.twitch.tv:8080/panel.html",
-                  "height": 300
-                },
-                "config": { "viewer_url": "https://localhost.rig.twitch.tv:8080/config.html" }
-              },
-              "config_url": "https://localhost.rig.twitch.tv:8080/config.html",
-              "live_config_url": "",
-              "icon_url": "https://media.forgecdn.net/avatars/154/735/636628000230800019.png",
-              "icon_urls": { "100x100": "https://media.forgecdn.net/avatars/154/735/636628000230800019.png" },
-              "screenshot_urls": ["internal/screenshots/test_data.png"],
-              "asset_urls": null,
-              "installation_count": -42,
-              "can_install": true,
-              "whitelisted_panel_urls": [],
-              "whitelisted_config_urls": [],
-              "required_broadcaster_abilities": [],
-              "eula_tos_url": "",
-              "privacy_policy_url": "",
-              "request_identity_link": false,
-              "vendor_code": "",
-              "sku": "",
-              "bits_enabled": false
-            }]
+          _total: 1,
+          extensions: [extension]
         };
         res.end(JSON.stringify(data));
       });

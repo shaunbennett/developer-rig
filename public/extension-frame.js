@@ -39,7 +39,7 @@ function proxyIframeEvent(event) {
 }
 
 function sendToService(endpoint, data, callback) {
-  var url = 'https://localhost.rig.twitch.tv:3000/' + endpoint;
+  var url = `${window.origin}/${endpoint}`;
   var request = new XMLHttpRequest();
   request.addEventListener("load", function() {
     console.log(endpoint, "response:", this.responseText);
