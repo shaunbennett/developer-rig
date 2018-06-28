@@ -6,6 +6,7 @@
   let context, contextChangedFields;
   let isVisible, visibilityCallback;
   let positionCallback;
+  let followCallback;
   let listeners = {};
   let webSocket;
 
@@ -101,16 +102,23 @@
       }
     },
     actions: {
-      followChannel: channelName => { }, // TODO
-      onFollow: callback => { }, // TODO
-      requestIdShare: () => { }, // TODO
+      followChannel: channelName => {
+        if (typeof followCallback === 'function') {
+          setTimeout(() => followCallback(true, channelName), 11);
+        }
+      },
+      onFollow: callback => {
+        followCallback = callback;
+      },
+      requestIdShare: () => {
+        if (typeof authCallback === 'function') {
+          setTimeout(() => {
+            authData.userId = '111111111';
+            authCallback(authData);
+          }, 11);
+        }
+      },
     },
-    purchases: {
-      beginPurchase: null, // TODO
-      onReloadEntitlements: null, // TODO
-      getPrices: null, // TODO
-    },
-    bits: null, // TODO
     rig: {
       log: (message, ...optionalParams) => {
         window.parent.parent.postMessage({
