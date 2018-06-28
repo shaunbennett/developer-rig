@@ -14,6 +14,14 @@ function proxyIframeEvent(event) {
     case 'twitch-ext-rig-log':
       window.parent.postMessage(data, '*');
       break;
+    case 'twitch-ext-auth':
+      console.log('got on auth');
+      break;
+    case 'twitch-ext-context':
+      console.log('got context');
+      const ext = document.getElementById('extension-frame').getElementsByTagName('iframe')[0].contentWindow;
+      ext.postMessage(data, '*');
+      break;
     default:
       break;
   }

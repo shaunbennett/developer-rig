@@ -1,0 +1,47 @@
+{
+    "onContext": [{
+        "name": "test",
+        "mode": "viewer",
+        "bitrate": 5000,
+        "bufferSize": 100,
+        "displayResolution": "640x480",
+        "game": "League Of Legends",
+        "hlsLatencyBroadcaster": 5,
+        "isFullScreen": false,
+        "isPaused": false,
+        "isTheatreMode": false,
+        "language": "en",
+        "playbackMode": "video",
+        "theme": "dark",
+        "videoResolution": "640x480"
+    }, {
+        "mode": "viewer",
+        "bitrate": 5000,
+        "bufferSize": 100,
+        "displayResolution": "640x480",
+        "game": "Super Smash Bros. Melee",
+        "hlsLatencyBroadcaster": 5,
+        "isFullScreen": false,
+        "isPaused": false,
+        "isTheatreMode": false,
+        "language": "en",
+        "playbackMode": "video",
+        "theme": "dark",
+        "videoResolution": "640x480"
+    }, {
+        "mode": "viewer",
+        "bitrate": 5000,
+        "bufferSize": 100,
+        "displayResolution": "640x480",
+        "game": "Super Smash Bros. Melee",
+        "hlsLatencyBroadcaster": 5,
+        "isFullScreen": false,
+        "isPaused": false,
+        "isTheatreMode": false,
+        "language": "en",
+        "playbackMode": "video",
+        "theme": "dark",
+        "videoResolution": "640x480"
+    }],
+    "onAuthorized": []
+}
