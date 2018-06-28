@@ -69,7 +69,7 @@ export function fetchExtensionManifest(host, clientId, version, jwt, onSuccess, 
       ]
     }),
     referrer: 'Twitch Developer Rig',
-  }).then((response) => response.json())
+  }).then((response) =>  response.json())
     .then((data) => {
       if (data.extensions && data.extensions.length > 0) {
         const manifest = data.extensions[0];
