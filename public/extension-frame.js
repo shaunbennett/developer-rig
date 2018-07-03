@@ -7,13 +7,11 @@ function proxyIframeEvent(event) {
     case 'extension-frame-init':
       const ExtensionFrame = window['extension-coordinator'].ExtensionFrame;
       parameters = event.data.extension;
-      console.log('parameters:', JSON.stringify(parameters));
       parameters.parentElement = document.getElementById('extension-frame');
       parameters.dobbin = { trackEvent: () => { } };
       extensionFrameAPI = new ExtensionFrame(parameters);
       break;
     case 'extension-frame-authorize':
-      console.log('got extension-frame-authorize');
       event.source.postMessage({
         action: "extension-frame-authorize-response",
         response: {
@@ -26,9 +24,15 @@ function proxyIframeEvent(event) {
       break;
     case 'extension-frame-pubsub':
       const { channelId, target, contentType, message } = e.data;
-      sendToService(`extensions/message/${channelId}`, { targets: [target], content_type: contentType, message }, () => {
-        console.log('sent to pubsub');
-      });
+      const url = `${window.origin}/extensions/message/${channelId}`;
+      fetch(url, {
+        body: JSON.stringify({ targets: [target], content_type: contentType, message }),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      }).catch(reason => console.error(endpoint, reason));
       break;
     case 'twitch-ext-rig-log':
       window.parent.postMessage(data, '*');
@@ -36,21 +40,4 @@ function proxyIframeEvent(event) {
     default:
       break;
   }
-}
-
-function sendToService(endpoint, data, callback) {
-  var url = `${window.origin}/${endpoint}`;
-  var request = new XMLHttpRequest();
-  request.addEventListener("load", function() {
-    console.log(endpoint, "response:", this.responseText);
-    var response = JSON.parse(this.responseText);
-    callback && callback(response);
-  });
-  request.addEventListener("error", function() { console.log(endpoint, 'error:', this); });
-  request.open(data ? "POST" : "GET", url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime());
-  if (data) {
-    request.setRequestHeader("Accept", "application/json");
-    request.setRequestHeader("Content-Type", "application/json");
-  }
-  request.send(JSON.stringify(data));
 }

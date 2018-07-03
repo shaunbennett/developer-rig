@@ -4,11 +4,13 @@ const cli = require("command-line-args");
 
 // Intialize and load command line parameters.
 const now = new Date() | 0;
-const types = ["panel", "video_overlay", "video_component"];
+const possibleTypes = ["panel", "video_overlay", "video_component", "mobile"];
 const stdout = "standard output";
+const defaultZoomPixels = 1024;
 const options = [
-  { name: "type", alias: "t", type: String, description: `type of extension, one of ${types.join(", ")}` },
+  { name: "types", alias: "t", type: String, multiple: true, description: `types of extension, at least one of ${possibleTypes.join(", ")}` },
   { name: "panel_height", alias: "p", type: Number, defaultValue: 300, description: "height of panel extension" },
+  { name: "zoom_pixels", alias: "z", type: Number, defaultValue: defaultZoomPixels, description: "base width of extension for calculating zoom (0 no zoom)" },
   { name: "component_size", alias: "c", type: String, defaultValue: "30%x40%", description: "size of video component extension, width by height" },
   { name: "base_uri", alias: "b", type: String, defaultValue: "https://localhost.rig.twitch.tv:8080", description: "testing base URI of extension assets" },
   { name: "author_name", alias: "a", type: String, defaultValue: "twitchrig", description: "extension author name" },
@@ -22,12 +24,13 @@ const options = [
 const args = cli(options);
 
 // Validate command line parameters.
-const type = args.type;
+const types = args.types;
 const componentSize = extractSize(args.component_size);
 const panelHeight = extractExtent(args.panel_height);
-if (args.help || !componentSize || !panelHeight || !types.some(choice => choice === type)) {
+const zoomPixels = args.zoom_pixels;
+if (args.help || !componentSize || !panelHeight || !areAllValid(types)) {
   const scriptName = process.argv[1].split(require("path").sep).pop();
-  console.log(`Usage: node ${scriptName} -t {${types.join(",")}} [other options]`);
+  console.log(`Usage: node ${scriptName} -t {${possibleTypes.join(",")}} [other options]`);
   console.log();
   options.forEach(option => {
     const defaultValue = option.defaultValue !== undefined ? ` (default ${JSON.stringify(option.defaultValue)})` : "";
@@ -41,14 +44,10 @@ if (args.help || !componentSize || !panelHeight || !types.some(choice => choice 
 }
 
 // Generate and print the manifest.
-const manifest = generateManifest();
+const manifest = generateManifest(args.base_uri);
 const outputFile = args.output_file;
-if (outputFile === stdout) {
-  console.log(manifest);
-} else {
-  const fd = fs.openSync(outputFile, "w");
-  fs.writeSync(fd, JSON.stringify(manifest));
-}
+const fd = outputFile === stdout ? process.stdout.fd : fs.openSync(outputFile, "w");
+fs.writeSync(fd, JSON.stringify(manifest));
 
 function extractSize(arg) {
   const ar = arg.split("x");
@@ -72,27 +71,28 @@ function extractExtent(arg) {
   }
 }
 
-function generateManifest() {
-  const baseUri = args.base_uri;
-  const viewerUrl = `${baseUri}/${type}.html`;
-  const viewKey = type === "video_component" ? "component" : type;
+function areAllValid(types) {
+  return types.length > 0 && types.every(type => ~possibleTypes.indexOf(type));
+}
+
+function generateManifest(baseUri) {
+  const viewerUrl = `${baseUri}/${types[0]}.html`;
   return {
     id: "u0000000000000000000" + now,
     state: "Testing",
     version: "0.0.1",
     anchor: "",
-    panel_height: type === "panel" ? panelHeight : 0,
+    panel_height: ~types.indexOf("panel") ? panelHeight : 0,
     author_name: args.author_name,
     support_email: args.support_email,
     name: args.name,
     description: args.description,
     summary: args.summary,
-    viewer_url: type === "panel" ? viewerUrl : "",
-    viewer_urls: { [viewKey]: viewerUrl },
-    views: {
-      [viewKey]: getView(),
+    viewer_url: viewerUrl,
+    viewer_urls: getViewerUrls(baseUri),
+    views: Object.assign(getViews(), {
       config: { viewer_url: `${baseUri}/config.html` }
-    },
+    }),
     config_url: `${baseUri}/config.html`,
     live_config_url: `${baseUri}/live_config.html`,
     icon_url: "https://media.forgecdn.net/avatars/158/128/636650453584584748.png",
@@ -112,26 +112,44 @@ function generateManifest() {
     bits_enabled: false
   };
 
-  function getView() {
-    switch (type) {
-      case "panel":
-        return {
-          viewer_url: viewerUrl,
-          height: panelHeight,
-        };
-      case "video_overlay":
-        return {
-          viewer_url: viewerUrl,
-        };
-      case "video_component":
-        return {
-          viewer_url: viewerUrl,
-          aspect_width: componentSize.width,
-          aspect_height: componentSize.height,
-          componentSize: 0,
-          zoom: true,
-          zoom_pixels: 1024,
-        };
+  function getViewerUrls(baseUri) {
+    const views = {};
+    for (const t of types) {
+      const viewKey = t === "video_component" ? "component" : t;
+      views[viewKey] = `${baseUri}/${t}.html`;
+    }
+    return views;
+  }
+
+  function getViews() {
+    const views = {};
+    for (const t of types) {
+      const viewKey = t === "video_component" ? "component" : t;
+      views[viewKey] = getView(t);
+    }
+    return views;
+
+    function getView(t) {
+      switch (t) {
+        case "panel":
+          return {
+            viewer_url: viewerUrl,
+            height: panelHeight,
+          };
+        case "video_overlay":
+          return {
+            viewer_url: viewerUrl,
+          };
+        case "video_component":
+          return {
+            viewer_url: viewerUrl,
+            aspect_width: componentSize.width,
+            aspect_height: componentSize.height,
+            size: 0,
+            zoom: !!zoomPixels,
+            zoom_pixels: zoomPixels || defaultZoomPixels,
+          };
+      }
     }
   }
 }

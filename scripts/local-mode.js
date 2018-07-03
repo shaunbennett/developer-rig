@@ -4,6 +4,7 @@ module.exports = function(app, extension) {
     return;
   }
 
+  const jwt = require('jsonwebtoken');
   const parseUrl = require('url').parse;
   const dateFormat = require('dateformat');
   const clientId = process.env.EXT_CLIENT_ID;
@@ -13,9 +14,8 @@ module.exports = function(app, extension) {
 
   // Create endpoints for API in local mode.
   app.get('/helix/users', (req, res) => {
-    // TODO:  check request headers for client identifier.
+    checkClientId(req.header('Client-ID'));
     const url = parseUrl(req.url, true);
-    console.log(`helix/users/${url.query.login}`);
     res.setHeader('Content-Type', '');
     res.writeHead(200);
     const data = {
@@ -36,11 +36,9 @@ module.exports = function(app, extension) {
     res.end(JSON.stringify(data));
   });
   app.post('/kraken/extensions/search', (req, res) => {
-    // TODO:  check request headers for client identifier and JWT authorization.
-    console.log(typeof req.body);
-    console.log(req.body);
+    checkClientId(req.header('Client-ID'));
+    checkToken(req.header('Authorization'));
     const search = req.body;
-    console.log(search.limit);
     res.setHeader('Content-Type', '');
     res.writeHead(200);
     const data = {
@@ -50,7 +48,7 @@ module.exports = function(app, extension) {
     res.end(JSON.stringify(data));
   });
   app.post('/extensions/message/:channelId', (req, res) => {
-    console.log(`extensions/message/${req.params.channelId}`, req.body);
+    checkToken(req.header('Authorization'));
     let message = {
       time_sent: dateFormat(new Date(), 'isoUtcDateTime'),
       content_type: req.body.content_type,
@@ -82,16 +80,10 @@ module.exports = function(app, extension) {
   const WebSocket = new require('ws');
   const wss = new WebSocket.Server({ server: socketServer });
   wss.on('connection', function(socket) {
-    console.log('connection', wss.clients.size);
-    socket.on('open', function() {
-      console.log('open');
-    });
     socket.on('message', function(message) {
-      console.log('message:', message);
       const data = JSON.parse(message);
       if (data.type === 'PING') {
         socket.send(JSON.stringify({ type: 'PONG' }));
-        console.log('sent PONG');
       } else {
         wss.clients.forEach(function(client) {
           if (client.readyState === WebSocket.OPEN) {
@@ -100,13 +92,24 @@ module.exports = function(app, extension) {
         });
       }
     });
-    socket.on('close', function(code, reason) {
-      console.log('close', code, reason);
-    });
   });
-  socketServer.listen(3003, function() {
-    console.log('listening on *:3003');
-  });
+  socketServer.listen(3003);
+
+  function checkClientId(header) {
+    if (clientId !== header) {
+      console.warn('Unexpected Client ID:', header);
+    }
+  }
+
+  function checkToken(header) {
+    const token = (header || '').split(' ')[1] || '';
+    try {
+      jwt.verify(token, new Buffer(process.env.EXT_SECRET, 'base64'));
+    } catch (ex) {
+      console.warn('Invalid JWT:', token || '(none)');
+    }
+  }
+
   function broadcast(data) {
     wss.clients.forEach(client => {
       if (client.readyState === WebSocket.OPEN) {

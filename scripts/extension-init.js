@@ -5,7 +5,6 @@ const optionDefinitions = [
   { name: "account", alias: "a", type: String, defaultValue: "twitchdev" },
   { name: "repo", alias: "r", type: String, defaultValue: "extensions-hello-world" },
   { name: "directory", alias: "d", type: String },
-  { name: "local_dir", alias: "l", type: String },
   { name: "help", alias: "h" },
 ];
 
@@ -17,7 +16,7 @@ function usageAndExit() {
 if (require.main === module) {
   const cli = require("command-line-args");
   const args = cli(optionDefinitions);
-  const directory = args["directory"] || args["local_dir"];
+  const directory = args["directory"];
   if (directory === undefined || "help" in args) {
     usageAndExit();
   }

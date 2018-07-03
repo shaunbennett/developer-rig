@@ -4,13 +4,12 @@ const http = require("http-server");
 const optionDefinitions = [
   { name: "directory", alias: "d", type: String },
   { name: "port", alias: "p", type: Number, defaultValue: 8080 },
-  { name: "rig_port", alias: "r", type: Number, defaultValue: 3000 },
   { name: "local", alias: "l", type: Boolean },
   { name: "help", alias: "h" },
 ];
 
 function usageAndExit() {
-  console.log("Usage: node host.js -d directory [-p port] [-r rig-port] [-l]");
+  console.log("Usage: node host.js -d directory [-p port] [-l]");
   process.exit(0);
 }
 
@@ -52,7 +51,7 @@ if (require.main === module) {
     fileNames.forEach(fileName => {
       if (args.local) {
         let fileText = fs.readFileSync(root + "/local/" + fileName, "utf8");
-        fileText = fileText.replace("%PORT%", args.rig_port);
+        fileText = fileText.replace("%PORT%", 3000);
         fs.writeFileSync(root + "/" + fileName, fileText, "utf8");
       } else {
         fs.copyFileSync(root + "/online/" + fileName, root + "/" + fileName);
