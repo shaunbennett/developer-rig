@@ -204,13 +204,13 @@ For developers currently in the Bits Limited Preview, this tab will let you conf
 ## Loading a Sample Extension
 By default, the Developer Rig links to sample Extension code available on [GitHub](https://github.com/TwitchDev/extensions-hello-world). To pull and link this code into the Developer Rig, run:
 ```bash
-# Usage: yarn extension-init -a [github_account] -r [github_repo] -l [local_dir]
-yarn extension-init -l <local_dir>
+# Usage: yarn extension-init -a [github_account] -r [github_repo] -d [directory]
+yarn extension-init -d <directory>
 ```
 To have the Developer Rig host the frontend assets of an Extension, use the `host` command. Assets for the sample Extension can be hosted on `https://localhost.rig.twitch.tv:8080` by issuing the following command:
 ```bash
-# Usage: yarn host -l [local_dir] -p [port]
-yarn host -l <local_dir>/public/ -p 8080
+# Usage: yarn host -d <directory> -p [port]
+yarn host -d <directory>/public/ -p 8080
 ```
 
 _Ensure that the URL that the sample Extension's Extension Backend Service (EBS) is running on and the Extension secret, match what is specified in the dev site!_
