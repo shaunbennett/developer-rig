@@ -47,7 +47,7 @@ if (args.help || !componentSize || !panelHeight || !areAllValid(types)) {
 const manifest = generateManifest(args.base_uri);
 const outputFile = args.output_file;
 const fd = outputFile === stdout ? process.stdout.fd : fs.openSync(outputFile, "w");
-fs.writeSync(fd, JSON.stringify(manifest));
+fs.writeSync(fd, JSON.stringify(manifest, null, 2));
 
 function extractSize(arg) {
   const ar = arg.split("x");
@@ -72,7 +72,7 @@ function extractExtent(arg) {
 }
 
 function areAllValid(types) {
-  return types.length > 0 && types.every(type => ~possibleTypes.indexOf(type));
+  return types && types.length > 0 && types.every(type => ~possibleTypes.indexOf(type));
 }
 
 function generateManifest(baseUri) {
@@ -91,7 +91,8 @@ function generateManifest(baseUri) {
     viewer_url: viewerUrl,
     viewer_urls: getViewerUrls(baseUri),
     views: Object.assign(getViews(), {
-      config: { viewer_url: `${baseUri}/config.html` }
+      config: { viewer_url: `${baseUri}/config.html` },
+      live_config: { viewer_url: `${baseUri}/live_config.html` },
     }),
     config_url: `${baseUri}/config.html`,
     live_config_url: `${baseUri}/live_config.html`,
