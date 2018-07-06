@@ -15,6 +15,7 @@
         "theme": "dark",
         "videoResolution": "640x480"
     }, {
+        "name": "onContext2",
         "mode": "viewer",
         "bitrate": 5000,
         "bufferSize": 100,
@@ -29,6 +30,7 @@
         "theme": "dark",
         "videoResolution": "640x480"
     }, {
+        "name": "onContext3",
         "mode": "viewer",
         "bitrate": 5000,
         "bufferSize": 100,

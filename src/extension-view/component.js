@@ -8,7 +8,8 @@ import { CONFIG_VIEW_DIMENSIONS, CONFIG_VIEW_WRAPPER_DIMENSIONS, PANEL_VIEW_DIME
 import closeButton from '../img/close_icon.png';
 import { ExtensionComponentView } from '../extension-component-view';
 import { ExtensionMobileView } from '../extension-mobile-view/component';
-
+import { RunListTrigger } from '../run-list-trigger';
+import * as runlist from '../../runlist/runlist.json';
 const { ExtensionAnchor, ExtensionMode, ExtensionViewType, ExtensionPlatform} = window['extension-coordinator'];
 
 export class ExtensionView extends Component {
@@ -17,7 +18,12 @@ export class ExtensionView extends Component {
 
     this.state = {
       mousedOver: false,
+      iframe: undefined,
     };
+
+    this.bindIframeToParent = (iframe) => {
+      this.state.iframe = iframe;
+    }
   }
 
   mouseEnter() {
@@ -62,6 +68,7 @@ export class ExtensionView extends Component {
           className="view"
           style={extensionProps.viewStyles}>
           <ExtensionFrame
+            bindIframeToParent={this.bindIframeToParent}
             className="view"
             frameId={`frameid-${this.props.id}`}
             extension={this.props.extension}
@@ -71,7 +78,11 @@ export class ExtensionView extends Component {
         </div>)
         break;
     }
-    return view;
+    return (
+      <div>
+        {view}
+      </div>
+    );
   }
 
   renderLinkedOrUnlinked() {
@@ -145,6 +156,7 @@ export class ExtensionView extends Component {
             </div>
           )
           }
+          <RunListTrigger runList={runlist} iframe={this.state.iframe}/>
           <div className={'view__descriptor'}>
             { this.props.role }
           </div>
