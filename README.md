@@ -35,7 +35,7 @@ Take the following steps to get Hello World running in Local Mode in the Rig.
   2.  `yarn install` # This takes about half a minute.
   3.  `yarn extension-init -l ../my-extension`  
         \# You may replace `my-extension` with a different directory name here and in subsequent steps.  This will clone the Hello World sample from GitHub
-2.  `yarn create-manifest -t type -o manifest.json [other options]` where type is the type of extension and manifest.json is the created extension manifest. Types can be: *panel*, *video* or *component* (you can have multiple types).  The other options are for panel or component sizes and several other text items. They all have reasonable defaults.  Note that you can directly edit the json file to make changes or adjustments.  See later in this document for specifics.
+2.  `yarn create-manifest -t type -o manifest.json [other options]` where type is the type of extension and manifest.json is the created extension manifest. Types can be: *panel*, *video_overlay*, *mobile* or *video_component* (you can have multiple types).  The other options are for panel or component attributes along with some text descriptors. They all have reasonable defaults and don't need to be set by you.  Note that you can directly edit the json file to make changes or adjustments.  See later in this document for specifics.
 4. `yarn start -l manifest.json` where manifest.json is the output of create-manifest.  **You will need to sign in with your Twitch credentials to use the rig in Local Mode.**
 5. `yarn host -d ../my-extension/public -p 8080 -l`. where ../my-extension/public is the public folder of the hello-world example extension
 
@@ -244,14 +244,14 @@ If you are experience difficulties getting things to work:
 * if you are struggling to get PubSub to work, assert that your EBS receives and extracts the channel name from the JWT sent by the Extension front end
 
 ## Using Local Mode
-Local Mode enables developers to run their extension projects against mock APIs and mock PubSub locally on their machine.  Developers can start building extensions without having first gone through the Twitch Extension Developer onboarding.  Additionally, it provides an ability to build integration tests against your extension via configurable responses to the mocks.  The following sections will illustrate how to use Local Mode in the Rig.  
+Local Mode enables developers to run their extension projects against mock APIs and mock PubSub locally on their machine.  Developers can start building extensions without having first gone through the Twitch Extension Developer onboarding.  Additionally, it provides an ability to perform integration tests against your extension via configurable responses to the Extensions Helper Library.  The following sections will illustrate how to use Local Mode in the Rig.  
 
 ### Using the Run List in the Rig
 The foundation of Local Mode is a JSON document called the "Run List".  It provides developers the ability to trigger specific callback responses through the Extensions Helper Library. To your extension, it will appear like these have come from Twitch Extension APIs.
 
 When you get the Local Mode edition of the rig, it will contain a Run List pre-populated with mock responses.  You'll be able to alter these responses by directly editing the document.
 
-When Local Mode is enabled, each extension view will have a dropdown that enables the developer to choose a response from the "Run List".  When a response is selected, clicking the "Trigger" button will send it through the Extension Coordinator and it will pass through Helper to the extension code.
+When Local Mode is enabled, each extension view will have a dropdown that enables the developer to choose a response from the "Run List".  When a response is selected, clicking the "Trigger" button will send it through the Extension Coordinator and it will pass through Helper to your extension code.
 
 Different views can be pointing at different places in the "Run List" at the same time.  
 
@@ -261,7 +261,7 @@ For more details about the APIs and responses see the documentation [here](https
 To edit the "Run List" look for the document called runlist.json in your Rig directory.  Each entry in the Run List has 3 components:
 1. A name for easy identification
 2. The type of callback e.g OnContext
-3. The Callback response
+3. The callback response
 
 You should refer to the Helper API documentation [here](https://dev.twitch.tv/docs/extensions/reference/#javascript-helper) before editing and creating new responses.
 
@@ -269,8 +269,17 @@ You should refer to the Helper API documentation [here](https://dev.twitch.tv/do
 When you are in Local Mode, to make calls to Pub Sub, it's important to make sure your EBS is pointing at the correct URI.  You'll want to be making calls to `localhost.rig.twitch.tv:3000/extensions/message` as opposed to `api.twitch.tv/extensions/message` in order to correctly send your message.  The rest of your message should be formatted the same as if you were sending to Twitch PubSub.  See the Hello World backend.js files for examples.
 
 ### Editing the Local Extension Manifest
-After you create your local extension manifest, you can open up manifest.json and edit the fields directly.  Most of the fields are not relevant to running your extension locally in the Developer Rig, but a few are useful to be aware of: **TODO**
+After you create your local extension manifest, you can open up manifest.json and edit the fields directly.  Most of the fields are not relevant to running your extension locally in the Developer Rig, but you should be aware of a few:
+  * name: Not critical for Local Mode, but it's always important to give your project a sweet name
+  * anchor: This should be left blank
+  * panel_height: This is the height of a panel extension. Default is 300 pixels and must be between 100 and 500 pixels.  For Panel extensions only.
+  * URLS of various views - When adding a view in the rig, it will look to these for the front end assets.  If you use the Rig host command, be sure to make sure the port and base URI are correct.
+  * aspect_width: expressed as a % of the screen width and must be < 50%.  30% would show up as 3000.  For Component Extensions only.
+  * aspect_height: expressed as a % of the screen height from 1% to 100%.  30% would show up as 3000.  For Component Extensions only.
+  * zoom_pixels: default is 1024.  For Component extensions only.
+  * zoom: default is true.  For Component Extensions only
 
+  When creating additional manifests, use the **-h** flag to see what additional arguments you can add.
 
 ## FAQs
 
