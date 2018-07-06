@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/twitchdev/developer-rig.svg?branch=master)](https://travis-ci.org/twitchdev/developer-rig) [![Coverage Status](https://coveralls.io/repos/github/twitchdev/developer-rig/badge.svg)](https://coveralls.io/github/twitchdev/developer-rig)
 
 ## Quickstart to Hello World with Developer Rig in Local Mode
-The Developer Rig can be used in two modes to test your Extension, Online Mode and Local Mode. Online Mode will let you test with production APIs and hosted assets on Twitch, but will first require completion of Extensions Developer onboarding [here](https://dev.twitch.tv/dashboard).  The Rig also supports Local Mode to let you get started building quickly pre-onboarding using mock versions of the APIs.
+The Developer Rig can be used in two modes to test your Extension, Online Mode and Local Mode. Online Mode will let you test with production APIs and hosted assets on Twitch, but will first require completion of Extensions Developer onboarding [here](https://dev.twitch.tv/dashboard).  The Rig also supports Local Mode to let you get started building quickly pre-onboarding, using mock versions of the APIs.
 
 Take the following steps to get Hello World running in Local Mode in the Rig.
 
@@ -35,8 +35,8 @@ Take the following steps to get Hello World running in Local Mode in the Rig.
   2.  `yarn install` # This takes about half a minute.
   3.  `yarn extension-init -l ../my-extension`  
         \# You may replace `my-extension` with a different directory name here and in subsequent steps.  This will clone the Hello World sample from GitHub
-2.  `yarn create-manifest -t type -o manifest.json [other options]` where type is the type of extension and manifest.json is the created extension manifest. Types can be: *panel*, *video* or *component* (you can have multiple types).  The other options are for panel or component sizes and several other text items. They all have reasonable defaults.  See later in this document for specifics.  Note that you can directly edit the json file to make changes or adjustments.
-4. `yarn start -l manifest.json` where manifest.json is the output of create-manifest.  *You will need to sign in with your Twitch credentials to use the rig in local mode.*
+2.  `yarn create-manifest -t type -o manifest.json [other options]` where type is the type of extension and manifest.json is the created extension manifest. Types can be: *panel*, *video* or *component* (you can have multiple types).  The other options are for panel or component sizes and several other text items. They all have reasonable defaults.  Note that you can directly edit the json file to make changes or adjustments.  See later in this document for specifics.
+4. `yarn start -l manifest.json` where manifest.json is the output of create-manifest.  **You will need to sign in with your Twitch credentials to use the rig in Local Mode.**
 5. `yarn host -d ../my-extension/public -p 8080 -l`. where ../my-extension/public is the public folder of the hello-world example extension
 
 **Mac Users**
@@ -52,7 +52,7 @@ Take the following steps to get Hello World running in Local Mode in the Rig.
 **All Developers**
 7. Run `node services/backend -l ../manifest.json` to locally run the Extension Backend Service for Hello World.  In this case, manifest.json is the same that was provided to the Yarn Start command and exists in the Developer Rig directory.
 8. In the Developer Rig, click the + button to create a new view.  You should see the Hello World extension in the Rig after this.
-9. Make sure local mode is turned on, and use the drop down for the view/trigger button to send mock responses to your extension.
+9. Make sure local mode is turned on, and use the drop down for the view/trigger button to send mock callback responses to your extension.
 
 See additional documentation on how to use the Developer Rig in Local Mode here: [Using Local Mode](#Using-Local-Mode)
 
@@ -107,7 +107,7 @@ Supported anchor types include:
 Extension output logs can be redirected to the [Rig Console](#rig-console), a Developer Rig specific local console.
 
 ## Getting Started in Online Mode
-If you're just getting started with Extensions and haven't going through Extension Developer Onboarding, follow the steps at the top of the documentation.  Otherwise, the following guide will help you create your first Extension on Twitch and run it in the Developer Rig in Online Mode.
+If you're just getting started with Extensions and haven't going through Extension Developer Onboarding, follow the steps at the top of the documentation for Local Mode.  Otherwise, the following guide will help you create your first Extension on Twitch and run it in the Developer Rig in Online Mode.
 
 #### Create an Extension on the Twitch Dev Site
 For each Extension to be tested online in the Developer Rig, a corresponding Extension needs to be created on the [Twitch Dev Site](https://dev.twitch.tv/dashboard). More detailed instructions to do this can be found [here](https://dev.twitch.tv/docs/extensions#creating-your-extension). Most fields are not relevant for the Developer Rig. The _Type of Extension_ is loaded into the Developer Rig, and is hence important. Similarly, the _Author Email_ must be correctly set and verified, before an [Extension secret](#developer-rig-configuration) can be created.
@@ -267,6 +267,10 @@ You should refer to the Helper API documentation [here](https://dev.twitch.tv/do
 
 ### Using Mock Pub Sub
 When you are in Local Mode, to make calls to Pub Sub, it's important to make sure your EBS is pointing at the correct URI.  You'll want to be making calls to `localhost.rig.twitch.tv:3000/extensions/message` as opposed to `api.twitch.tv/extensions/message` in order to correctly send your message.  The rest of your message should be formatted the same as if you were sending to Twitch PubSub.  See the Hello World backend.js files for examples.
+
+### Editing the Local Extension Manifest
+After you create your local extension manifest, you can open up manifest.json and edit the fields directly.  Most of the fields are not relevant to running your extension locally in the Developer Rig, but a few are useful to be aware of: **TODO**
+
 
 ## FAQs
 
