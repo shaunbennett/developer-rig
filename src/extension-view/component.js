@@ -43,6 +43,7 @@ export class ExtensionView extends Component {
     switch (this.props.type) {
       case ExtensionAnchor.Component:
         view = (<ExtensionComponentView
+          bindIframeToParent={this.bindIframeToParent}
           id={`component-${this.props.id}`}
           className="view"
           frameId={`frameid-${this.props.id}`}
@@ -53,6 +54,7 @@ export class ExtensionView extends Component {
         break;
       case ExtensionViewType.Mobile:
         view = (<ExtensionMobileView
+          bindIframeToParent={this.bindIframeToParent}
           id={`mobile-${this.props.id}`}
           className="view"
           frameId={`frameid-${this.props.id}`}
@@ -138,9 +140,24 @@ export class ExtensionView extends Component {
         style={extensionProps.viewWrapperStyles}>
         <div
           className={'view__header'}>
+          <div className={'view__header-container'}>
+            <div className={'view__descriptor'}>
+            { this.props.role } <span> </span>
+              {(this.props.role === ViewerTypes.LoggedIn) ?
+                this.renderLinkedOrUnlinked() : null}
+            </div>
+
+            <RunListTrigger runList={runlist} iframe={this.state.iframe}/>
+
+            {this._isEditable() &&
+              <div className='view__edit_button'
+              onClick={() => { this.props.openEditViewHandler(this.props.id) }}>
+              Edit
+              </div>}
+          </div>
           {(this.props.deleteViewHandler !== undefined && this.state.mousedOver) &&
             (
-            <div>
+
               <div className={'view__close_button'}
                 onClick={() => { this.props.deleteViewHandler(this.props.id) }}>
               <img
@@ -148,22 +165,11 @@ export class ExtensionView extends Component {
                 src={closeButton}
               />
               </div>
-              { this._isEditable() &&
-                <div className='view__edit_button'
-                onClick={() => { this.props.openEditViewHandler(this.props.id) }}>
-                Edit
-                </div>}
-            </div>
-          )
+
+            )
           }
-          <RunListTrigger runList={runlist} iframe={this.state.iframe}/>
-          <div className={'view__descriptor'}>
-            { this.props.role }
-          </div>
-          <div className={'view__descriptor'}>
-            {(this.props.role === ViewerTypes.LoggedIn) ?
-              this.renderLinkedOrUnlinked() : null}
-          </div>
+
+
         </div>
         {this.renderView(extensionProps)}
       </div>

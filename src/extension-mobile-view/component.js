@@ -55,6 +55,7 @@ export class ExtensionMobileView extends Component {
         style={this.computeViewStyles()}>
           <div style={this.computeFrameStyles()}>
           <ExtensionFrame
+            bindIframeToParent={this.props.bindIframeToParent}
             className="view"
             frameId={`frameid-${this.props.id}`}
             extension={this.props.extension}

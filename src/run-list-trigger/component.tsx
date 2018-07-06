@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { RunList, GenericResponse } from '../core/models/run-list';
+import './component.sass';
 
 const EXTENSION_ON_CONTEXT = 'twitch-ext-context';
 const EXTENSION_ON_AUTHORIZED = 'twitch-ext-auth';
-const EXTENSION_ON_ERROR = 'twitch-ext-error';
 
 export interface PublicProps {
   runList: RunList;
@@ -39,17 +39,21 @@ export class RunListTrigger extends React.Component<Props, State>{
   }
 
   private stateFromRunList(runList: RunList): State {
+    let firstTrigger = undefined;
     let runlistMap: { [key: string]: GenericResponse} = {}
     let triggerMap: { [key: string]: string } = {}
     for (let callback in runList) {
       for (let resp of runList[callback]) {
+        if (!firstTrigger) {
+          firstTrigger = resp.name;
+        }
         runlistMap[resp.name] = resp;
         triggerMap[resp.name] = callback;
       }
     }
 
     return {
-      selectedTrigger: undefined,
+      selectedTrigger: firstTrigger,
       runListTriggerMap: runlistMap,
       triggerTypeMap: triggerMap,
     }
@@ -57,7 +61,10 @@ export class RunListTrigger extends React.Component<Props, State>{
 
   private dataFromTrigger(trigger: string) {
     let data = undefined;
-    const response = this.state.runListTriggerMap[trigger];
+
+    const response = Object.assign({}, this.state.runListTriggerMap[trigger]);
+    delete response.name;
+
     switch (this.state.triggerTypeMap[trigger]) {
       case 'onContext':
         data = {
@@ -69,12 +76,6 @@ export class RunListTrigger extends React.Component<Props, State>{
         data = {
           action: EXTENSION_ON_AUTHORIZED,
           auth: response,
-        }
-        break;
-      case 'onError':
-        data = {
-          action: EXTENSION_ON_ERROR,
-          error: response,
         }
         break;
     }
@@ -104,11 +105,11 @@ export class RunListTrigger extends React.Component<Props, State>{
 
   public render() {
     return (
-      <>
+      <div className='runlist-trigger-container'>
         <select onChange={(e) => this.onChange(e)}>
           {this.renderRunListOptions(this.props.runList)}
         </select>
         <button onClick={() => this.triggerRunlistResponse(this.props.iframe)}>Trigger</button>
-      </>);
+      </div>);
   }
 }

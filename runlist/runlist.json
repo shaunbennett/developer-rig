@@ -45,5 +45,11 @@
         "theme": "dark",
         "videoResolution": "640x480"
     }],
-    "onAuthorized": []
+    "onAuthorized": [{
+        "name": "onAuthorized1",
+        "channelId": "test123",
+        "clientId": "sdkjflasfdjk",
+        "token": "lol.lol.lol",
+        "userId": "testuser"
+    }]
 }

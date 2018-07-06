@@ -22,19 +22,24 @@
 .view__header
   padding: 1em
   height: 20px
+  display: flex
+
+.view__header-container
+  display: flex
+  width: 90%
+  flex-direction: row
+  justify-content: flex-end
 
 .view__close_button
-  float: right
-  padding-left: .8em
   color: #511798
   cursor: pointer
-  margin-top: .3em
+  margin-top:
 
 .view__descriptor
-  float: left
-  padding-right: .8em
+  padding-right: 10px
   font-size: .75em
   color: #A4A4A4
+  margin-right: auto
 
 .view__edit_button
   color: white
@@ -47,5 +52,5 @@
   line-height: 25px
   cursor: pointer
   margin-right: .5em
-  float: right
+  align-self: flex-end
   font-size: .75em

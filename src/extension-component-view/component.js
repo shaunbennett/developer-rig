@@ -50,6 +50,7 @@ export class ExtensionComponentView extends Component {
         }}>
           <div style={this.computeViewStyles()}>
           <ExtensionFrame
+            bindIframeToParent={this.props.bindIframeToParent}
             className="view"
             frameId={`frameid-${this.props.id}`}
             extension={this.props.extension}

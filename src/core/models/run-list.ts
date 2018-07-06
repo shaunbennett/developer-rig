@@ -24,11 +24,8 @@ export interface OnAuthorizedResponse extends GenericResponse{
   userId: string;
 }
 
-export interface OnErrorResponse extends GenericResponse{ }
-
 export interface RunList {
   onContext: OnContextResponse[];
   onAuthorized: OnAuthorizedResponse[];
-  onError: OnErrorResponse[];
   [key: string]: GenericResponse[];
 }
