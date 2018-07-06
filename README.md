@@ -6,7 +6,7 @@ The Developer Rig can be used in two modes to test your Extension, Online Mode a
 
 Take the following steps to get Hello World running in Local Mode in the Rig.
 
-**Mac Users**
+### Mac Users
 1.  Install all dependencies.  (It is possible to use **brew** for all of these)
   1.  [Node LTS](https://nodejs.org/en/download/).  If you already have Node installed, it must be at least version 6
   2.  [Yarn](https://yarnpkg.com/lang/en/docs/install).
@@ -15,7 +15,7 @@ Take the following steps to get Hello World running in Local Mode in the Rig.
   1.  Open a terminal window.
   2.  Execute `echo '127.0.0.1 localhost.rig.twitch.tv' | sudo tee -a /etc/hosts`.  Provide your password if prompted.
 
-**PC Users**
+### PC Users
 1. Install all dependencies.
     1.  [Node LTS](https://nodejs.org/en/download/).  If you already have Node installed, it must be at least version 6.
     2.  [Yarn](https://yarnpkg.com/lang/en/docs/install).
@@ -29,7 +29,7 @@ Take the following steps to get Hello World running in Local Mode in the Rig.
     5.  Add `127.0.0.1 localhost.rig.twitch.tv` to the bottom of the file.
     6.  Press Ctrl+S to save your changes.
 
-**All Developers**
+### All Developers
 1. Open **Git Bash** and execute these commands in a directory of your choosing.
   1.  Navigate to the root folder where you have downloaded/cloned the Developer Rig.
   2.  `yarn install` # This takes about half a minute.
@@ -39,17 +39,17 @@ Take the following steps to get Hello World running in Local Mode in the Rig.
 4. `yarn start -l manifest.json` where manifest.json is the output of create-manifest.  **You will need to sign in with your Twitch credentials to use the rig in Local Mode.**
 5. `yarn host -d ../my-extension/public -p 8080 -l`. where ../my-extension/public is the public folder of the hello-world example extension
 
-**Mac Users**
+### Mac Users
 6. Generate the necessary certs for your Hello World backend.  Navigate to the root of the Hello World extension folder and run `npm install` and then `npm run cert`
 
-**PC Users**
+### PC Users
 6. Run the following commands to generate the necessary certs for your Hello World backend
   1. `node scripts/ssl.js`
   2. `mkdir ../my-extension/conf`
   3. `mv ssl/selfsigned.crt ../my-extension/conf/server.crt`
   4. `mv ssl/selfsigned.key ../my-extension/conf/server.key`
 
-**All Developers**
+### All Developers
 7. Run `node services/backend -l ../manifest.json` to locally run the Extension Backend Service for Hello World.  In this case, manifest.json is the same that was provided to the Yarn Start command and exists in the Developer Rig directory.
 8. In the Developer Rig, click the + button to create a new view.  You should see the Hello World extension in the Rig after this.
 9. Make sure local mode is turned on, and use the drop down for the view/trigger button to send mock callback responses to your extension.
