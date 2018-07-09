@@ -2,25 +2,25 @@
 [![Build Status](https://travis-ci.org/twitchdev/developer-rig.svg?branch=master)](https://travis-ci.org/twitchdev/developer-rig) [![Coverage Status](https://coveralls.io/repos/github/twitchdev/developer-rig/badge.svg)](https://coveralls.io/github/twitchdev/developer-rig)
 
 ## Quickstart to Hello World with Developer Rig in Local Mode
-The Developer Rig can be used in two modes to test your Extension, Online Mode and Local Mode. Online Mode will let you test with production APIs and hosted assets on Twitch, but will first require completion of Extensions Developer onboarding [here](https://dev.twitch.tv/dashboard).  The Rig also supports Local Mode to let you get started building quickly pre-onboarding, using mock versions of the APIs.
+The Developer Rig can be used in two modes to test your Extension, Online Mode and Local Mode.  Online Mode will let you test with production APIs and hosted assets on Twitch, but will first require completion of Extensions Developer onboarding [here](https://dev.twitch.tv/dashboard).  The Rig also supports Local Mode to let you get started building quickly pre-onboarding, using mock versions of the APIs.
 
 Take the following steps to get Hello World running in Local Mode in the Rig.
 
 ### Mac Users
-1.  Install all dependencies.  (It is possible to use **brew** for all of these)
-  1.  [Node LTS](https://nodejs.org/en/download/).  If you already have Node installed, it must be at least version 6
-  2.  [Yarn](https://yarnpkg.com/lang/en/docs/install).
-  3.  [Git](https://git-scm.com/download/mac).
+1.  Install all dependencies.  (It is possible to use [brew](https://brew.sh/) to install all of these.)
+    1.  [Node LTS](https://nodejs.org/en/download/).  If you already have Node installed, it must be at least version 6.
+    2.  [Yarn](https://yarnpkg.com/lang/en/docs/install).
+    3.  [Git](https://git-scm.com/download/mac).
 2.  Add `127.0.0.1 localhost.rig.twitch.tv` to `/etc/hosts`.
-  1.  Open a terminal window.
-  2.  Execute `echo '127.0.0.1 localhost.rig.twitch.tv' | sudo tee -a /etc/hosts`.  Provide your password if prompted.
+    1.  Open a terminal window.
+    2.  Execute `echo '127.0.0.1 localhost.rig.twitch.tv' | sudo tee -a /etc/hosts`.  Provide your password if prompted.
 
 ### PC Users
-1. Install all dependencies.
+1.  Install all dependencies.
     1.  [Node LTS](https://nodejs.org/en/download/).  If you already have Node installed, it must be at least version 6.
     2.  [Yarn](https://yarnpkg.com/lang/en/docs/install).
     3.  [Python 2](https://www.python.org/downloads/release/python-2715/).
-    4.  [Git for Windows](https://github.com/git-for-windows/git/releases/download/v2.17.1.windows.2/Git-2.17.1.2-64-bit.exe).  Its shell is used in subsequent steps.
+    4.  [Git for Windows](https://github.com/git-for-windows/git/releases/download/v2.17.1.windows.2/Git-2.17.1.2-64-bit.exe).  Its shell, **Git Bash**, is used in subsequent steps.
 2.  Add `127.0.0.1 localhost.rig.twitch.tv` to `/etc/hosts`.
     1.  Press the Windows key.
     2.  Type `notepad`.
@@ -29,30 +29,40 @@ Take the following steps to get Hello World running in Local Mode in the Rig.
     5.  Add `127.0.0.1 localhost.rig.twitch.tv` to the bottom of the file.
     6.  Press Ctrl+S to save your changes.
 
-### All Developers
-1. Open **Git Bash** and execute these commands in a directory of your choosing.
-  1.  Navigate to the root folder where you have downloaded/cloned the Developer Rig.
-  2.  `yarn install` # This takes about half a minute.
-  3.  `yarn extension-init -d ../my-extension`
-        \# You may replace `my-extension` with a different directory name here and in subsequent steps.  This will clone the Hello World sample from GitHub
-2.  `yarn create-manifest -t type -o manifest.json [other options]` where type is the type of extension and manifest.json is the created extension manifest. Types can be: *panel*, *video_overlay*, *mobile* or *video_component* (you can have multiple types).  The other options are for panel or component attributes along with some text descriptors. They all have reasonable defaults and don't need to be set by you.  Note that you can directly edit the json file to make changes or adjustments.  See later in this document for specifics.
-4. `yarn start -l manifest.json` where manifest.json is the output of create-manifest.  **You will need to sign in with your Twitch credentials to use the rig in Local Mode.**
-5. `yarn host -d ../my-extension/public -p 8080 -l`. where ../my-extension/public is the public folder of the hello-world example extension
-
-### Mac Users
-6. Generate the necessary certs for your Hello World backend.  Navigate to the root of the Hello World extension folder and run `npm install` and then `npm run cert`
-
-### PC Users
-6. Run the following commands to generate the necessary certs for your Hello World backend
-  1. `node scripts/ssl.js`
-  2. `mkdir ../my-extension/conf`
-  3. `mv ssl/selfsigned.crt ../my-extension/conf/server.crt`
-  4. `mv ssl/selfsigned.key ../my-extension/conf/server.key`
+**NOTE:**  in the following instructions, a terminal window refers to **Git Bash**, not a Windows command prompt.  The default installation of **Git for Windows** will put an icon on your desktop to launch **Git Bash**.
 
 ### All Developers
-7. Run `node services/backend -l ../manifest.json` to locally run the Extension Backend Service for Hello World.  In this case, manifest.json is the same that was provided to the Yarn Start command and exists in the Developer Rig directory.
-8. In the Developer Rig, click the + button to create a new view.  You should see the Hello World extension in the Rig after this.
-9. Make sure local mode is turned on, and use the drop down for the view/trigger button to send mock callback responses to your extension.
+3.  Open a terminal window and run these commands.
+    1.  `cd path/to/developer-rig`
+    2.  `yarn install`  
+        This takes about half a minute.
+    3.  `yarn extension-init -d ../my-extension`  
+        You may replace *my-extension* with a different directory name here and in subsequent steps.  This will clone the Hello World sample from GitHub.
+    4.  `yarn create-manifest -t panel -o ../panel.json`  
+        *panel* is the type of extension (in this case, a panel extension) and *panel.json* is a file created in the parent directory containing the manifest for your extension.  You may specify multiple types, any combination of *panel*, *video_overlay*, *mobile* and *video_component*.  There are other options for panel or component attributes along with some text descriptors.  They all have reasonable defaults and don't need to be set by you.  (For more information on the available options, run `yarn create-manifest -h`.)  Note that you can edit the JSON file to make changes or adjustments.
+    5.  `yarn host -d ../my-extension/public -p 8080 -l`  
+        *../my-extension/public* is the public folder of the hello-world example extension created in step 3.iii above.
+4.  Visit https://localhost.rig.twitch.tv:8080/panel.html.  If necessary, allow the certificate.  You will see `Hello, World!` in the browser window.
+5.  Open a terminal window and run the following commands to generate the necessary SSL certificates for and run your Hello World backend.
+    1.  `cd path/to/my-extension`  
+        This is the directory created in step 3.iii above.
+    2.  `npm install`
+    3.  `npm run cert`
+    4.  `node services/backend -l ../panel.json`  
+        *../panel.json* is the path to the file created in step 3.iv above.
+6.  Visit https://localhost:8081.  If necessary, allow the certificate.  You will see some JSON describing a 404 response in the browser window.
+7.  Open a terminal window and run these commands.
+    1.  `cd path/to/developer-rig`
+    2.  `yarn start -l ../panel.json`  
+        *../panel.json* is the path to the file created in step 3.iv above.  **You will need to sign in with your Twitch credentials to use the rig in Local Mode.**
+8.  Visit https://localhost.rig.twitch.tv:3003.  If necessary, allow the certificate.  You will see `live` in the browser window.
+9.  Verify the rig is working.
+    1.  Click the `+` button.  The Add a new view panel will appear.
+    2.  Select the `Broadcaster` viewer type and click `Save`.  The Broadcaster view will appear.
+    3.  Click `Yes, I would`.  Verify the color changes and there is output to match that request in the second terminal window.
+    4.  Click the `+` button again.  The Add a new view panel will appear.
+    5.  Select the `Logged-Out Viewer` viewer type and click `Save`.  The Logged-Out Viewer view will appear.
+    6.  Click `Yes, I would`.  Verify the color changes in both views and there is output to match that request in the second terminal window.
 
 See additional documentation on how to use the Developer Rig in Local Mode here: [Using Local Mode](#Using-Local-Mode)
 
@@ -233,7 +243,7 @@ https://localhost.rig.twitch.tv:[port]
 When an Extension has been loaded into the Developer Rig, refreshing your browser window will cause the latest Extension assets to be pulled into the page.
 
 ## TL;DR
-Conceptualising how an Extension works can be tricky, particularly in the context of the Developer Rig. Three main pieces are needed:
+Conceptualizing how an Extension works can be tricky, particularly in the context of the Developer Rig. Three main pieces are needed:
 * the Developer Rig service (i.e. `yarn start`)
 * a service hosting the Extension front end and associated assets (i.e. `yarn host`)
 * an Extension Backend Service (EBS)
