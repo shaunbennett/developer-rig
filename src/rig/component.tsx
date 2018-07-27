@@ -98,7 +98,6 @@ export class RigComponent extends React.Component<Props, State> {
   public openConfigurationsHandler = () => {
     this.setState({
       showConfigurations: true,
-      selectedView: Configurations
     });
   }
 

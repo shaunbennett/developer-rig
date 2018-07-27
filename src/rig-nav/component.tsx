@@ -27,10 +27,6 @@ export interface ReduxStateProps {
 type Props = PublicProps & ReduxStateProps;
 
 export class RigNavComponent extends React.Component<Props> {
-  private openConfigurationsHandler = (): void => {
-    this.props.openConfigurationsHandler();
-  }
-
   private openProductManagementHandler = (): void => {
     const { session, manifest, openProductManagementHandler } = this.props;
     if ((session && session.login) && (manifest && manifest.bits_enabled)) {
@@ -56,11 +52,6 @@ export class RigNavComponent extends React.Component<Props> {
       'top-nav-item__selected': selectedView === LiveConfig,
     });
 
-    const configurationsClass = classNames({
-      'top-nav-item': true,
-      'top-nav-item__selected': selectedView === Configurations,
-    });
-
     const productManagementClass = classNames({
       'top-nav-item': true,
       'top-nav-item__selected': selectedView === ProductManagement,
@@ -81,6 +72,9 @@ export class RigNavComponent extends React.Component<Props> {
             {manifest && <div className='personal-bar__ext-name'>
               <span>{manifest.name}</span>
             </div>}
+            <button onClick={(event) => this.props.openConfigurationsHandler()}>
+              Configurations
+            </button>
             <div className='top-nav-item__login'>
               {(session && session.login) ? <UserDropdown session={session} /> : <LoginButton/>}
             </div>
@@ -94,9 +88,6 @@ export class RigNavComponent extends React.Component<Props> {
             </a>
             <a className={liveConfigClass} onClick={(event) => this.props.liveConfigHandler()}>
               Live Config
-            </a>
-            <a className={configurationsClass} onClick={(event) => this.openConfigurationsHandler()}>
-              Configurations
             </a>
             <a className={productManagementClass} onClick={(event) => this.openProductManagementHandler()}>
               Manage Bits Products
