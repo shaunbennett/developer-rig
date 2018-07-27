@@ -291,11 +291,10 @@ export class RigComponent extends React.Component<Props, State> {
             closeHandler={this.closeEditViewHandler}
             saveViewHandler={this.editViewHandler}
           />}
-        <RigConfigurationsDialog
-          show={this.state.showConfigurations}
+        {this.state.showConfigurations && <RigConfigurationsDialog
           config={this.state.manifest}
           closeConfigurationsHandler={this.closeConfigurationsHandler}
-          refreshConfigurationsHandler={this.refreshConfigurationsHandler} />
+          refreshConfigurationsHandler={this.refreshConfigurationsHandler} />}
         {!this.props.session &&
           <SignInDialog
             show={this.state.showSignInDialog}
