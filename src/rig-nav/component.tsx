@@ -7,6 +7,7 @@ import { UserSession } from '../core/models/user-session';
 import { ExtensionManifest } from '../core/models/manifest';
 import './component.sass';
 import { MockApiDropdown } from './mock-api-dropdown';
+import * as gear from '../img/gear.svg';
 
 export interface PublicProps {
   openProductManagementHandler: Function,
@@ -72,9 +73,9 @@ export class RigNavComponent extends React.Component<Props> {
             {manifest && <div className='personal-bar__ext-name'>
               <span>{manifest.name}</span>
             </div>}
-            <button onClick={(event) => this.props.openConfigurationsHandler()}>
-              Configurations
-            </button>
+            <div className='personal-bar__configurations' onClick={(event) => this.props.openConfigurationsHandler()} title='Configurations'>
+              <img src={gear} width={32} height={32} alt='Configurations' />
+            </div>
             <div className='top-nav-item__login'>
               {(session && session.login) ? <UserDropdown session={session} /> : <LoginButton/>}
             </div>
