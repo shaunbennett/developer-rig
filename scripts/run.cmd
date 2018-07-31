@@ -27,12 +27,19 @@ REM Check for elevation and invoke configuration appropriately.
 CALL "%~dp0check-configure.cmd"
 IF ERRORLEVEL 1 (
 	CALL "%~dp0configure.cmd"
-	ECHO When configuration completes,
-	PAUSE
+	IF NOT ERRORLEVEL 1 (
+		ECHO When configuration completes,
+		PAUSE
+	)
 ) ELSE (
 	CALL "%~dp0configure.cmd" -
 )
-PATH %PATH%;%SystemDrive%\Python27;%ProgramFiles%\nodejs;%ProgramFiles(x86)%\Yarn\bin;%ProgramFiles%\Git\cmd
+IF NOT ERRORLEVEL 1 CALL :path_and_check
+IF ERRORLEVEL 1 (
+	ECHO Configuration did not complete properly.  You will need to correct the
+	ECHO problems and re-run this script.
+	GOTO done
+)
 
 REM Provide defaults in case of no arguments.
 SET PARENT=%~dp0..\..
@@ -96,3 +103,7 @@ IF EXIST "%~2" (
 	ECHO Cannot open %~3 "%~2".
 	"%T%\fail" 2> NUL
 )
+
+:path_and_check
+PATH %PATH%;%SystemDrive%\Python27;%ProgramFiles%\nodejs;%ProgramFiles(x86)%\Yarn\bin;%ProgramFiles%\Git\cmd
+CALL "%~dp0check-configure.cmd" -

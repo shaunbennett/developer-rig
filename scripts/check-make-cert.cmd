@@ -13,5 +13,6 @@ IF "%HAS_ALL_FILES%" == "YES" (
 	powershell -Command "& {Get-ChildItem -Path Cert:\LocalMachine\Root}" | FIND "Twitch Developer Rig CA" > NUL
 	IF NOT ERRORLEVEL 1 EXIT /B 0
 )
+IF NOT "%~1" == "" EXIT /B 1
 net file > NUL 2> NUL
 EXIT /B

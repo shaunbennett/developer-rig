@@ -11,7 +11,10 @@ python --version > NUL 2> NUL
 IF ERRORLEVEL 1 SET REQUIRES_ELEVATION=1
 CALL yarn --version > NUL 2> NUL
 IF ERRORLEVEL 1 SET REQUIRES_ELEVATION=1
-IF %REQUIRES_ELEVATION% == 1 net file > NUL 2> NUL
+IF %REQUIRES_ELEVATION% == 1 (
+	IF NOT "%~1" == "" EXIT /B 1
+	net file > NUL 2> NUL
+)
 EXIT /B
 
 REM Determine if an appropriate version of node is available.
